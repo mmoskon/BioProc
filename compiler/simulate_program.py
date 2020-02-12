@@ -4,9 +4,10 @@ import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 import numpy as np
 import importlib
+import seaborn as sns
 
 
-def simulate_program(program_name, t_end, N, params_ff, params_addr, params_proteolysis, params_condition, params_prog, n_bits, ax=plt, plot_clock = True):
+def simulate_program(program_name, t_end, N, params_ff, params_addr, params_proteolysis, params_condition, params_prog, n_bits, ax=plt, plot_clock = True, plot_instructions = False, plot_ops = True, alpha_plot = 0.75):
     
     model_name = program_name.split(".")[0]
     
@@ -32,21 +33,10 @@ def simulate_program(program_name, t_end, N, params_ff, params_addr, params_prot
     T = np.linspace(0, t_end, N)
     Y = odeint(model.model, Y0, T, args=params)
 
-    i = -len(ops)
-    for op in ops:
-        o = Y[:,i]
-        ax.plot(T,o)
-        i += 1
+    legend = []
+
         
-
-
-    if plot_clock:
-        clk = get_clock(T)
-        ax.plot(T,clk, color="black", alpha=0.1)
-        ax.legend(ops + ['clk'], loc='upper left')
-
-    else:
-
+    if plot_instructions:
         if n_bits == 3:
             i1 = Y[:,-6-len(ops)]
             i2 = Y[:,-5-len(ops)]
@@ -65,29 +55,55 @@ def simulate_program(program_name, t_end, N, params_ff, params_addr, params_prot
             i8 = Y[:,-1-len(ops)]
 
 
-        ax.plot(T,i1)
-        ax.plot(T,i2)
-        ax.plot(T,i3)
-        ax.plot(T,i4)
-        ax.plot(T,i5)
-        ax.plot(T,i6)
+        ax.plot(T,i1, alpha=alpha_plot)
+        ax.plot(T,i2, alpha=alpha_plot)
+        ax.plot(T,i3, alpha=alpha_plot)
+        ax.plot(T,i4, alpha=alpha_plot)
+        ax.plot(T,i5, alpha=alpha_plot)
+        ax.plot(T,i6, alpha=alpha_plot)
         if n_bits == 4:
-            ax.plot(T,i7)
-            ax.plot(T,i8)
+            ax.plot(T,i7, alpha=alpha_plot)
+            ax.plot(T,i8, alpha=alpha_plot)
 
-       
-
-
+    
         
         if n_bits == 3:
-            ax.legend(['i1','i2','i3','i4','i5','i6']+ops, loc='upper left')
+            ax.legend(ops+['i1','i2','i3','i4','i5','i6'], loc='upper left')
+            legend += ['i1','i2','i3','i4','i5','i6']
         else:
-            ax.legend(['i1','i2','i3','i4','i5','i6','i7','i8']+ops, loc='upper left')
+            ax.legend(ops+['i1','i2','i3','i4','i5','i6','i7','i8'], loc='upper left')
+            legend += ['i1','i2','i3','i4','i5','i6','i7','i8']
+
+    if plot_ops:
+        i = -len(ops)
+        for op in ops:
+            o = Y[:,i]
+            ax.plot(T,o, alpha=alpha_plot)
+            i += 1
+
+        legend += ops
     
+    
+    if plot_clock:
+        clk = get_clock(T)
+        ax.plot(T,clk, color="black", alpha=0.1)
+        ax.legend(ops + ['clk'], loc='upper left')
+        legend += ['clk']
+    
+    
+    if ax != plt:
+        ax.set_xlabel('time [h]')
+        ax.set_ylabel('concentrations')
+
+    ax.legend(legend, loc='upper left')
+
     if ax == plt:
         plt.savefig("figs\\"+program_name.split(".")[0]+".pdf", bbox_inches = 'tight')
         plt.savefig("figs\\"+program_name.split(".")[0]+".png")
         
+        plt.xlabel('time [h]')
+        plt.ylabel('concentrations')
+
         plt.show()
 
 
@@ -100,7 +116,17 @@ if __name__ == '__main__':
     t_end = 200
     N = 1000
 
-    n_bits = 4
+    n_bits = 3
+
+    plot_ops = True
+
+    prog_alpha = 10
+    prog_delta = 0.1#0.01
+    prog_n = 2
+    prog_Kd = 10
+    
+
+
     #program_name = "programs\\program_add.txt"
     #program_name = "programs\\program_add_nop.txt"
     #program_name = "programs\\program_sub.txt"
@@ -110,17 +136,22 @@ if __name__ == '__main__':
     #program_name = "programs\\program_if.txt"
     #program_name = "programs\\program_if_false.txt"
     #program_name = "programs\\program_add_multi.txt"
-    program_name = "programs\\program_while.txt"
+    #program_name = "programs\\program_while.txt"
     #
-    # program_name = "programs\\program_if2.txt"
+    #program_name = "programs\\program_if.txt"
+    
+    ### Figures for the paper ###
+    #program_name, t_end = "programs\\Figure_nop.txt", 150
+    #program_name = "programs\\Figure_halt.txt"
+    #program_name, t_end = "programs\\Figure_jump_unconditional.txt", 120
+    #program_name, t_end = "programs\\Figure_jump_conditional_false.txt", 120
+    #program_name, t_end, prog_delta = "programs\\Figure_jump_conditional_true.txt", 120, 0.08
+    #program_name, t_end, prog_delta = "programs\\Figure_if_true.txt", 120, 0.08
+    #program_name, t_end, prog_delta = "programs\\Figure_if_false.txt", 120, 0.08
+    program_name, t_end = "programs\\Figure_while.txt", 180
 
+    plot_multi = True
 
-    plot_multi = False
-
-    prog_alpha = 10
-    prog_delta = 0.1#0.01
-    prog_n = 2
-    prog_Kd = 10
     params_prog  = prog_alpha, prog_delta, prog_n, prog_Kd
 
 
@@ -135,6 +166,8 @@ if __name__ == '__main__':
     points = np.loadtxt('selected_points.txt')
 
     
+    #with plt.style.context('fivethirtyeight'):
+    sns.set_style("white")
 
     if plot_multi:
 
@@ -154,9 +187,9 @@ if __name__ == '__main__':
             params_ff = list(params[:8])
             params_addr = list(params[8:])   
 
-            simulate_program(program_name, t_end, N, params_ff, params_addr, params_proteolysis, params_condition, params_prog, n_bits, ax)
+            simulate_program(program_name, t_end, N, params_ff, params_addr, params_proteolysis, params_condition, params_prog, n_bits, ax, plot_instructions=True, plot_ops = plot_ops)
         plt.gcf().set_size_inches(15,5)
-        plt.savefig("figs\\"+program_name+".pdf", bbox_inches = 'tight')
+        plt.savefig("figs\\"+program_name.split(".")[0]+".pdf", bbox_inches = 'tight')
         plt.show()  
     
     else:

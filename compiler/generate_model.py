@@ -189,9 +189,7 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
                 operands.add(ops[0])
                 instr = ops[1]    
                 ops = ops[2:]
-
-
-
+            
             if instr == 'nop':
                 pass
             elif instr == 'generate':
@@ -235,6 +233,25 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
                 S.append(s)
 
                 break
+            elif instr == "jump" or instr=="jumpif":
+                
+                i_src = "i"+str(addr)
+                i_dst = "i"+str(addr+1)
+
+                if instr == "jump":   
+                    inhibition.append(True)
+                    condition.append("0")
+                else: # jumpif
+                    inhibition.append(False)
+                    condition.append(ops[0])
+                    operands.add(ops[0])
+                
+                r,s  = from_i_to_RS(i_src, i_dst, n_bits = n_bits)
+                R.append(r)
+                S.append(s)
+                
+                
+            
             
         addr += 1
         
