@@ -1,0 +1,2 @@
+generate A
+sub C, A, B

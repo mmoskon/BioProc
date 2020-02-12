@@ -1,0 +1,3 @@
+generate A
+generate B
+add C, A, B

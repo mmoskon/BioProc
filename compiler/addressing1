@@ -1,0 +1,4 @@
+i1, i2,
+alpha_a, delta_a, Kd_a, n_a,
+	di1_dt = alpha_a * activate_1(not_q0, Kd_a, n_a) - delta_a * i1
+	di2_dt = alpha_a * activate_1(q0, Kd_a, n_a) - delta_a * i2
