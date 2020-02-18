@@ -19,7 +19,7 @@ model_mode = one_bit_processor_ext
 #model_mode = three_bit_processor_ext
 
 
-folder_name = "results"
+folder_name = "results_opt"
 if model_mode == one_bit_processor_ext:
 	file_name = "01_bioproc"
 elif model_mode == two_bit_processor_ext:
@@ -27,7 +27,7 @@ elif model_mode == two_bit_processor_ext:
 else:
 	file_name = "03_bioproc"
 
-filename =  os.path.join(".", "bioproc", folder_name, file_name)                                             
+filename =  os.path.join(".", folder_name, file_name)                                             
 print(filename)        
 
 model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=model_mode, parameter_values=param_values, avg_dev=30)                                      
