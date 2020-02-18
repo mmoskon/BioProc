@@ -163,7 +163,7 @@ if __name__ == '__main__':
     params_condition = [KD_cond]
 
     # other params - outputs of GA
-    points = np.loadtxt('selected_points.txt')
+    points = np.loadtxt('selected_points.txt')[:3]
 
     
     #with plt.style.context('fivethirtyeight'):

@@ -4,8 +4,30 @@ from bioproc.hill_functions import *
 """
 FLIP-FLOP MODELS
 """
+# MASTER-SLAVE D FLIP-FLOP QSSA MODEL
+def ff_stochastic_model(Y, T, params, omega):
+	p = np.zeros(12)  
 
+	a, not_a, q, not_q, d, clk = Y
+	alpha1, alpha2, alpha3, alpha4, delta1, delta2, Kd, n = params
+    
+	p[0] = alpha1*(pow(d/(Kd*omega), n)/(1 + pow(d/(Kd*omega), n) + pow(clk/(Kd*omega), n) + pow(d/(Kd*omega), n)*pow(clk/(Kd*omega), n)))*omega   
+	p[1] = alpha2*(1/(1 + pow(not_a/(Kd*omega), n)))*omega    
+	p[2] = delta1*a  
+	p[3] = alpha1*(1/(1 + pow(d/(Kd*omega), n) + pow(clk/(Kd*omega), n) + pow(d/(Kd*omega), n)*pow(clk/(Kd*omega), n)))*omega   
+	p[4] = alpha2*(1/(1 + pow(a/(Kd*omega), n)))*omega   
+	p[5] = delta1*not_a 
+	p[6] = alpha3*((pow(a/(Kd*omega), n)*pow(clk/(Kd*omega), n))/(1 + pow(a/(Kd*omega), n) + pow(clk/(Kd*omega), n) + pow(a/(Kd*omega), n)*pow(clk/(Kd*omega), n)))*omega
+	p[7] = alpha4*(1/(1 + pow(not_q/(Kd*omega), n)))*omega   
+	p[8] = delta2*q 
+	p[9] = alpha3*((pow(not_a/(Kd*omega), n)*pow(clk/(Kd*omega), n))/(1 + pow(not_a/(Kd*omega), n) + pow(clk/(Kd*omega), n) + pow(not_a/(Kd*omega), n)*pow(clk/(Kd*omega), n)))*omega   
+	p[10] = alpha4*(1/(1 + pow(q/(Kd*omega), n)))*omega 
+	p[11] = delta2*not_q 
 
+	#propensities     
+	return p   
+	
+	
 # MASTER-SLAVE D FLIP-FLOP MODEL
 def ff_ode_model(Y, T, params): 
     
@@ -68,6 +90,60 @@ def ff_ode_model_RS(Y, T, params):
 """
 ADRESSING MODELS
 """
+
+# ADDRESSING 1-BIT QSSA MODEL
+def addressing_stochastic_one_bit_model(Y, T, params, omega):   
+    alpha, delta, Kd, n = params
+    _,_, q1, not_q1, i1, i2 = Y  
+    p = np.zeros(4) 
+	
+    p[0] = alpha*activate_1(not_q1, Kd*omega, n)*omega  
+    p[1] = delta*i1  
+    p[2] = alpha*activate_1(q1, Kd*omega, n)*omega 
+    p[3] = delta*i2
+	
+    #propensities    
+    return p
+
+# ADDRESSING 2-BIT QSSA MODEL 
+def addressing_stochastic_two_bit_model(Y, T, params, omega):   
+    alpha, delta, Kd, n = params
+    _, _, q1, not_q1, _, _, q2, not_q2, i1, i2, i3, i4 = Y
+    p = np.zeros(8)  
+	
+    p[0] = alpha * activate_2(not_q1, not_q2, Kd*omega, n)*omega 
+    p[1] = delta * i1
+    p[2] = alpha * activate_2(q1, not_q2, Kd*omega, n)*omega  
+    p[3] = delta * i2 
+    p[4] = alpha * activate_2(q1, q2, Kd*omega, n)*omega    
+    p[5] = delta * i3  
+    p[6] = alpha * activate_2(not_q1, q2, Kd*omega, n)*omega
+    p[7] = delta * i4    
+			
+    #propensities    
+    return p 
+
+# ADDRESSING 3-BIT QSSA MODEL 
+def addressing_stochastic_three_bit_model(Y, T, params, omega):   
+    alpha, delta, Kd, n = params
+    _, _, q1, not_q1, _, _, q2, not_q2, _, _, q3, not_q3, i1, i2, i3, i4, i5, i6 = Y 
+    p = np.zeros(12)  
+	
+    p[0] = alpha * activate_2(not_q1, not_q3, Kd*omega, n)*omega
+    p[1] = delta * i1
+    p[2] = alpha * activate_2(q1, not_q2, Kd*omega, n)*omega 
+    p[3] = delta * i2
+    p[4] = alpha * activate_2(q2, not_q3, Kd*omega, n)*omega
+    p[5] = delta * i3
+    p[6] = alpha * activate_2(q1, q3, Kd*omega, n)*omega
+    p[7] = delta * i4
+    p[8] = alpha * activate_2(not_q1, q2, Kd*omega, n)*omega
+    p[9] = delta * i5  
+    p[10] = alpha * activate_2(not_q2, q3, Kd*omega, n)*omega  
+    p[11] = delta * i6    	
+	
+	#propensities      
+    return p   	 	
 
 # ONE BIT ADDRESSING MODEL SIMPLE
 def one_bit_simple_addressing_ode_model(Y, T, params):

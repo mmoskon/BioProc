@@ -3,10 +3,10 @@ def model(Y, T, params):
 	a0, not_a0, q0, not_q0,a1, not_a1, q1, not_q1,a2, not_a2, q2, not_q2,i1, i2, i3, i4, i5, i6,condition,=Y
 	alpha1, alpha2, alpha3, alpha4, delta1, delta2, Kd, n, deltaE, KM,alpha_a, delta_a, Kd_a, n_a,KD_cond,=params
 	clk = get_clock(T)
-	prog_Kd_condition=10
+	prog_n_condition=2
 	prog_delta_condition=0.08
 	prog_alpha_condition=10
-	prog_n_condition=2
+	prog_Kd_condition=10
 	dcondition_dt=+prog_alpha_condition*activate_1(i3,prog_Kd_condition,prog_n_condition)-prog_delta_condition*condition
 	cond0=condition
 	RESET0=max((induction(i4, cond0, KD_cond),)) if T > 1 else 100

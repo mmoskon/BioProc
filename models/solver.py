@@ -14,6 +14,7 @@ import matplotlib.ticker as ticker
 import os.path 
 
 from bioproc.proc_opt import BioProc  
+from bioproc.proc_models import * 
 
 '''
 Regions consist of cloud of points and principal component that govern the direction of exploration  
@@ -31,8 +32,8 @@ class Region:
 		self.maxIter = 10            
 		self.threshold = 0.001    
 		self.label = label
-		self.maxVarScale = 4
-		self.minVarScale = 2   
+		self.maxVarScale = 6      
+		self.minVarScale = 3       
 		self.varScaleDt = (self.maxVarScale - self.minVarScale)/(float(self.maxIter))    		     		
 		self.varScale = self.maxVarScale         
 		self.depth = depth     
@@ -67,10 +68,10 @@ class Region:
 The main class
 '''
 class Solver:
-	def __init__(self, model, populationSize=10000, NGEN = 20, nsamples = 1e5):                                                                    
-		self.model = model                  
+	def __init__(self, model, populationSize=10000, NGEN = 10, nsamples = 1e5):                                                                     
+		self.model = model                   
 		self.populationSize = populationSize          
-		self.NGEN = NGEN             
+		self.NGEN = NGEN              
 		self.nsamples = int(nsamples)    	
 		self.indpb = 0.75       	
 		
@@ -117,7 +118,7 @@ class Solver:
 		candidate = []
 		for ind in range(self.model.nParams): 
 			candidate.append(random.uniform(self.model.parameter_values[self.model.params[ind]]["min"], self.model.parameter_values[self.model.params[ind]]["max"]))
-		return creator.Candidate(candidate) 	
+		return creator.Candidate(candidate)
 		
 	def checkOutAllBounds(self, candidate):
 		for idx, val in enumerate(candidate):
@@ -217,7 +218,7 @@ class Solver:
 
 	
 	#returns the viable volume for 
-	def getViableVolume(self, viableRegions, sample_size = int(1e4)):
+	def getViableVolume(self, viableRegions, sample_size = int(1e4)): #1e4      
 		volume = 0 
 
 		for region in viableRegions:		
@@ -241,11 +242,11 @@ class Solver:
 			ratio = count/sample_size   
 			volume = volume + ratio*volB  			
 	
-		print("Bounding box volume " + str(volB)) 
-		print("Volume " + str(volume))   
-		print("Total volume " + str(self.model.getTotalVolume()))   		
-		print("Volume ratio:" + str(volume/self.model.getTotalVolume())) 
-		return volume 
+		description = "Bounding box volume " + str(volB) + "\n" 
+		description += "Volume " + str(volume) + "\n" 
+		description += "Total volume " + str(self.model.getTotalVolume()) + "\n"    
+		description +=	"Volume ratio:" + str(volume/self.model.getTotalVolume())   	
+		return volume, description    
 
 	def setBoxColors(self, bp, nRegions, ax, colors = ["#0E74C8", "#15A357", "r", "k"]):
 		colorLen = len(colors) 
@@ -341,9 +342,10 @@ class Solver:
 							inBounds.append(cand)  
 					inBounds = np.array(inBounds)   		
 					candidateSet = inBounds   
-					
+
+					Y = fpca.transform(candidateSet) 					
 					X = fpca.transform(set.points) 
-					Y = fpca.transform(candidateSet) 	 				
+ 	 				
 					fig = plt.figure(iter)  
 					plt.clf()          
 					plt.scatter(Y[:, 0], Y[:, 1], c="red", alpha=0.1, edgecolor='k', rasterized=True)  
@@ -353,25 +355,20 @@ class Solver:
 					plt.ylabel('PC 2')    
 					plt.savefig(filename + "Set" + set.label + "Iter" + str(set.iter) + ".pdf")        	 
 					#identify viable points  
-					viablePoints = np.array(self.getViablePoints(candidateSet)) 
+					viablePoints = np.array(self.getViablePoints(candidateSet))  
 					
 					#if viable set is smaller than number of parameters do not accept it
-					print("Number of viable points: " + str(len(viablePoints)))   
-					
-					if len(viablePoints) <= setSize/10:   						 
-						#cluster if not enough points obtained with sampling    
-						print("Clustering, insufficient number of points")   
-						set.terminated = True      
-						set.cluster = True           
-					else:
-						pickle.dump(candidateSet, open(filename + "_Region" + str(set.label) + "CandidateSet_Iter" + str(set.iter) +  ".p", "wb+"))     
-						pickle.dump(viablePoints, open(filename + "_Region" + str(set.label) + "ViableSet_Iter" + str(set.iter) + ".p", "wb+"))  						
-						set.points = viablePoints           
-						set.fitPCA()     	 			
+					print("Number of viable points: " + str(len(viablePoints)))    					
+
+					pickle.dump(candidateSet, open(filename + "_Region" + str(set.label) + "CandidateSet_Iter" + str(set.iter) +  ".p", "wb+"))     
+					pickle.dump(viablePoints, open(filename + "_Region" + str(set.label) + "ViableSet_Iter" + str(set.iter) + ".p", "wb+"))  						
+					set.points = viablePoints           
+					set.fitPCA()   
+						
 				#if set not already terminated, terminate it and cluster   
-				elif not set.terminated:    
-					set.terminated = True       
-					set.cluster = True         					
+				elif not set.terminated:     
+					set.terminated = True        
+					set.cluster = True           					
 						
 			#clustering, check for new clusters        	            
 			newViableSets = list()   
@@ -401,7 +398,7 @@ class Solver:
 		
 if __name__ == '__main__':
 
-	parameter_values = {  "transcription": {"min": 0.01, "max": 50},   
+	param_values = {  "transcription": {"min": 0.01, "max": 50},   
 				"translation": {"min": 0.01, "max": 50},  
 				"protein_production": {"min": 0.1, "max": 50},            				
 				"rna_degradation": {"min": 0.1, "max": 100},        
@@ -409,19 +406,19 @@ if __name__ == '__main__':
 				"hill": {"min": 1, "max": 5},         
 				"Kd": {"min": 0.01, "max": 250}, 
 				"protease_concentration": {"min": 10, "max":1000}      	
-				}    	 
-
-	#flip flop with instructions internal clock  
-	#filename =  os.path.join(".", "bioproc", "internal_clock3", "bioproc")             
-	#print(filename)    
-	#model = BioProc(parameter_values, np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill", "protein_production", "protein_degradation", "Kd", "hill"]), np.array([0]*15), fake_clock=False)      
-	#solver = Solver(model)               
-	#solver.run(filename, maxDepth=1)        
+				}     	  
 
 	#flip flop with instructions external clock  
-	filename =  os.path.join(".", "bioproc", "external_clock5", "bioproc")                             
-	print(filename)    
-	model = BioProc(parameter_values, np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), np.array([0]*12), avg_dev=50, fake_clock=True)               
-	solver = Solver(model)                      
-	solver.run(filename, maxDepth=1)         	
+	filename =  os.path.join(".", "bioproc", "three_bit_model_new_new", "bioproc")                                                 
+	print(filename)        
+	model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=three_bit_processor_ext, parameter_values=param_values, avg_dev=30)                                         
+	solver = Solver(model)                         
+	solver.run(filename, maxDepth=1) #do not cluster         
+
+	""" 
+	model modes: 
+		- one_bit_processor_ext
+		- two_bit_processor_ext 
+		- three_bit_processor_ext
+	""" 
 	
