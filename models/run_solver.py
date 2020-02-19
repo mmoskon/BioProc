@@ -19,7 +19,7 @@ model_mode = one_bit_processor_ext
 #model_mode = three_bit_processor_ext
 
 
-folder_name = "results_opt"
+folder_name = "results_opt4"
 if model_mode == one_bit_processor_ext:
 	file_name = "01_bioproc"
 elif model_mode == two_bit_processor_ext:

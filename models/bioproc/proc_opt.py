@@ -202,8 +202,9 @@ class BioProc:
 		print(t_fitness) 
 		return t_fitness,               		
 		
-	def isViable(self, point):  
-		fitness = self.eval(point)   
+	def isViable(self, point, fitness=None):  
+		if not fitness:
+			fitness = self.eval(point)   
 		#print(fitness[0])   
 		return fitness[0] >= self.threshold           		
 	
