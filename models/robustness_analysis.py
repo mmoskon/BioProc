@@ -7,6 +7,7 @@ import numpy as np
 import os.path      
 import pickle     
 import seaborn as sns
+import pandas as pd
 
 sns.set_style("white")
 
@@ -100,6 +101,47 @@ def plotBoxPlots():
     
     plt.show()      
 """ 
+
+def getCosts(number_points = 0, file_name = ""):     
+    rand_samples = []
+    for model_index in range(num_models_regions):
+        region = model_regions[model_index]   
+        if number_points:
+            samples = region.points[np.random.choice(region.points.shape[0], number_points, replace=False), :]            
+        else:
+            samples = region.points
+
+        rand_samples.append(samples)
+    
+    df = pd.DataFrame(columns=['Model id', 'Region id', 'cost'])
+
+    for model_id in range(num_models_fitness):
+        model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_id])                                          
+        for region_id in range(num_models_regions):
+            for sample in rand_samples[region_id]:
+                cost = -model.eval(sample)[0]
+                df = df.append({'Model id': model_id+1, 'Region id': region_id+1, 'cost':cost}, ignore_index=True)
+
+    if file_name:
+        df.to_csv(file_name, index=False)
+
+    return df
+
+def plotCostdf(df=None, number_points = 0):
+    if not type(df):
+        df = getCosts(number_points)
+    
+    df['Model id'] = df['Model id'].astype(int)
+    df['Region id'] = df['Region id'].astype(int)
+
+    sns.violinplot(x="Model id", y="cost", hue="Region id", data=df, palette="Pastel1")
+    plt.savefig(os.path.join(base_path_robustness, 'cost_distrib_sns.pdf'), bbox_inches = 'tight')
+    plt.show()
+
+
+
+
+
 def plotCost(number_points = 0):     
     
     rand_samples = []
@@ -137,6 +179,7 @@ def plotCost(number_points = 0):
         
         #plt.boxplot(model_evals)
         ax.violinplot(model_evals)  
+        ax.boxplot(model_evals) 
         ax.set_xticks([1,2,3])
                       
         all_costs.append(model_evals)      
@@ -150,6 +193,73 @@ def plotCost(number_points = 0):
 
     plt.savefig(os.path.join(base_path_robustness, 'cost_distrib.pdf'), bbox_inches = 'tight')
     plt.show()      
+
+
+
+
+def getParamDistrib(number_points = 0, file_name = ""):    
+    rand_samples = []    
+    for model_index in range(num_models_regions):
+        region = model_regions[model_index]   
+        if number_points:
+            samples = region.points[np.random.choice(region.points.shape[0], number_points, replace=False), :]
+        else:
+            samples = region.points
+
+        rand_samples.append(samples)
+
+    rand_samples = np.array(rand_samples)
+
+    param_names = [r"$\alpha_1$", r"$\alpha_2$", r"$\alpha_3$", r"$\alpha_4$", r"$\delta_1$", r"$\delta_2$", r"$K_d$", r"$n$", r"$\alpha_I$", r"$\delta_I$", r"$K_{d_I}$", r"$n_I$"]
+    
+    df1 = pd.DataFrame(rand_samples[0])
+    df1.columns = param_names
+    df1["Model id"] = 1
+    
+    df2 = pd.DataFrame(rand_samples[1])
+    df2.columns = param_names
+    df2["Model id"] = 2
+
+    df = pd.concat([df1, df2], ignore_index=True)
+    
+    """
+    for model_id in range(num_models_regions):
+        df_tmp = pd.DataFrame(columns = ['Parameter', 'Value'])
+        for sample in rand_samples[model_id]:
+            for name, value in zip(param_names, sample):
+                df_tmp.append({'Parameter': name, 'Value': value}, ignore_index=True)
+        
+        df_tmp['Model id'] = model_id+1
+        if model_id == 0:
+            df = df_tmp
+        else:
+            df = pd.concat([df, df_tmp], ignore_index=True)
+    """
+    if file_name:
+        df.to_csv(file_name, index=False)
+    return df
+
+def plotParamsdf(df=None, number_points = 0):
+    if not type(df):
+        df = getParamDistrib(number_points)
+    
+    df['Model id'] = df['Model id'].astype(int)
+
+
+    param_names = [r"$\alpha_1$", r"$\alpha_2$", r"$\alpha_3$", r"$\alpha_4$", r"$\delta_1$", r"$\delta_2$", r"$K_d$", r"$n$", r"$\alpha_I$", r"$\delta_I$", r"$K_{d_I}$", r"$n_I$"]
+    
+    fig, axes = plt.subplots(3,4)
+
+    for param_id in range(len(param_names)):
+        ax = axes.flat[param_id]
+
+        sns.violinplot(y = param_names[param_id], x="Model id", data=df[[param_names[param_id], "Model id"]], palette="Pastel1", ax = ax)
+    
+    fig.set_size_inches([20,12])
+    plt.savefig(os.path.join(base_path_robustness, 'params_distrib_sns.pdf'), bbox_inches = 'tight')   
+    plt.show()
+
+
 
 def plotParamDistrib(number_points = 0):     
     
@@ -170,6 +280,7 @@ def plotParamDistrib(number_points = 0):
     param_names = [r"$\alpha_1$", r"$\alpha_2$", r"$\alpha_3$", r"$\alpha_4$", r"$\delta_1$", r"$\delta_2$", r"$K_d$", r"$n$", r"$\alpha_I$", r"$\delta_I$", r"$K_{d_I}$", r"$n_I$"]
     
     fig, axes = plt.subplots(3,4)
+    
 
     for param_id in range(len(param_names)):
         ax = axes.flat[param_id]
@@ -183,6 +294,7 @@ def plotParamDistrib(number_points = 0):
         
         #plt.boxplot([rand_samples[0,:,i],rand_samples[1,:,i], rand_samples[2,:,i]])
         ax.violinplot([rand_samples[0][:,param_id],rand_samples[1][:,param_id]])
+        ax.boxplot([rand_samples[0][:,param_id],rand_samples[1][:,param_id]])
         ax.set_xticks([1,2,3])
         #ax.set_xticklabels([1,2,3])
 
@@ -219,15 +331,25 @@ def plotStochasticSimulations(number_points = 5):
 			plt.legend()			
 			plt.show()	 
             
-            
-#calculateVolumes(model_index=0)  
-#calculateVolumes(model_index=1)    
-#calculateVolumes(model_index=2)      
+if __name__ == '__main__':            
+    #calculateVolumes(model_index=0)  
+    #calculateVolumes(model_index=1)    
+    #calculateVolumes(model_index=2)      
 
-plotCost(number_points = 100)  
+    #plotCost(number_points = 5)  
 
-#plotParamDistrib()
+    #plotParamDistrib()
 
-#plotStochasticSimulations()   
+    #plotStochasticSimulations()   
 
 
+    #df = getCosts(number_points = 5, file_name = "costs.csv")
+
+
+    #df = getCosts(number_points=5, file_name="results_robustness\\costs.csv")
+    df = pd.read_csv("results_robustness\\costs.csv")
+    plotCostdf(df)
+
+    #df = getParamDistrib(file_name="results_robustness\\params.csv")
+    df = pd.read_csv("results_robustness\\params.csv")
+    plotParamsdf(df)
