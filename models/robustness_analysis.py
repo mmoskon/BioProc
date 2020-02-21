@@ -10,50 +10,7 @@ import seaborn as sns
 import pandas as pd
 
 sns.set_style("white")
-
-ga_solutions = False
-local_solutions = True
-
-
-#base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt2")]
-base_paths_opt = [os.path.join(".", "results_opt")]
-
-
-base_path_robustness = os.path.join(".", "results_robustness") 
-
-
-
-models = [one_bit_processor_ext, two_bit_processor_ext, three_bit_processor_ext]   
-
-#folders = [os.path.join(base_path, "one_bit_model"), os.path.join(base_path, "two_bit_model"), os.path.join(base_path, "three_bit_model")]   
-model_regions = []
-
-num_models_fitness = 3
-num_models_regions = 2
-
-    
-for model_index in range(num_models_regions):                    
-    #folder = folders[model_index]               
-    model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_index])                                       
-    solver = Solver(model)    
-
-    model_str = '0'+str(model_index+1)+'_'
-    region_files =  []
-    for base_path_opt in base_paths_opt:
-        if ga_solutions:
-            region_files.append(os.path.join(base_path_opt, model_str+"bioprocViableSet_IterGA.p"))
-        if local_solutions:
-            for i in range(10):
-                region_files.append(os.path.join(base_path_opt, model_str+"bioproc_Region0ViableSet_Iter" + str(i+1) + ".p"))
-
-    viablePoints = []   
-    for region_file in region_files: 
-        viablePointsRegion = pickle.load(open(region_file, "rb"))   
-        print(len(viablePointsRegion))   
-        viablePoints.extend(viablePointsRegion)
-    print("Number of points ("+str(model_index+1)+"-bit):",len(viablePoints))
-    region = Region(viablePoints, model, "region")              
-    model_regions.append(region)        
+ 
         
 def calculateVolumes(model_index=0):    
     model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_index], avg_dev=30)    
@@ -216,11 +173,25 @@ def getParamDistrib(number_points = 0, file_name = ""):
     df1.columns = param_names
     df1["Model id"] = 1
     
-    df2 = pd.DataFrame(rand_samples[1])
-    df2.columns = param_names
-    df2["Model id"] = 2
+    df = df1
 
-    df = pd.concat([df1, df2], ignore_index=True)
+    if num_models_regions >= 2:
+
+        df2 = pd.DataFrame(rand_samples[1])
+        df2.columns = param_names
+        df2["Model id"] = 2
+
+        df = pd.concat([df1, df2], ignore_index=True)
+
+    if num_models_regions >= 3:
+
+        df3 = pd.DataFrame(rand_samples[2])
+        df3.columns = param_names
+        df3["Model id"] = 3
+
+        df = pd.concat([df1, df2, df3], ignore_index=True)
+
+    
     
     """
     for model_id in range(num_models_regions):
@@ -293,8 +264,8 @@ def plotParamDistrib(number_points = 0):
 
         
         #plt.boxplot([rand_samples[0,:,i],rand_samples[1,:,i], rand_samples[2,:,i]])
-        ax.violinplot([rand_samples[0][:,param_id],rand_samples[1][:,param_id]])
-        ax.boxplot([rand_samples[0][:,param_id],rand_samples[1][:,param_id]])
+        ax.violinplot([rand_samples[0][:,param_id]])#,rand_samples[1][:,param_id]])
+        #ax.boxplot([rand_samples[0][:,param_id]])#,rand_samples[1][:,param_id]])
         ax.set_xticks([1,2,3])
         #ax.set_xticklabels([1,2,3])
 
@@ -331,7 +302,64 @@ def plotStochasticSimulations(number_points = 5):
 			plt.legend()			
 			plt.show()	 
             
-if __name__ == '__main__':            
+if __name__ == '__main__':  
+
+
+    #
+    # SETTINGS
+    #
+    ga_solutions = False
+    local_solutions = True
+
+    #base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt2")]#, os.path.join(".", "results_opt3")]
+    base_paths_opt = [os.path.join(".", "results_opt")]
+    num_models_fitness = 3
+    num_models_regions = 3
+
+
+    base_path_robustness = os.path.join(".", "results_robustness") 
+
+
+    #
+    # END OF SETTINGS
+    #
+
+
+    models = [one_bit_processor_ext, two_bit_processor_ext, three_bit_processor_ext]   
+
+    #folders = [os.path.join(base_path, "one_bit_model"), os.path.join(base_path, "two_bit_model"), os.path.join(base_path, "three_bit_model")]   
+    model_regions = []
+
+        
+    for model_index in range(num_models_regions):                    
+        #folder = folders[model_index]               
+        model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_index])                                       
+        solver = Solver(model)    
+
+        model_str = '0'+str(model_index+1)+'_'
+        region_files =  []
+        for base_path_opt in base_paths_opt:
+            if ga_solutions:
+                region_files.append(os.path.join(base_path_opt, model_str+"bioprocViableSet_IterGA.p"))
+            if local_solutions:
+                for i in range(10):
+                    region_files.append(os.path.join(base_path_opt, model_str+"bioproc_Region0ViableSet_Iter" + str(i+1) + ".p"))
+
+        viablePoints = []   
+        for region_file in region_files: 
+            viablePointsRegion = pickle.load(open(region_file, "rb"))   
+            print(len(viablePointsRegion))   
+            viablePoints.extend(viablePointsRegion)
+        print("Number of points ("+str(model_index+1)+"-bit):",len(viablePoints))
+        region = Region(viablePoints, model, "region")              
+        model_regions.append(region)       
+
+
+
+
+
+
+
     #calculateVolumes(model_index=0)  
     #calculateVolumes(model_index=1)    
     #calculateVolumes(model_index=2)      
@@ -347,9 +375,9 @@ if __name__ == '__main__':
 
 
     #df = getCosts(number_points=5, file_name="results_robustness\\costs.csv")
-    df = pd.read_csv("results_robustness\\costs.csv")
-    plotCostdf(df)
+    #df = pd.read_csv("results_robustness\\costs.csv")
+    #plotCostdf(df)
 
-    #df = getParamDistrib(file_name="results_robustness\\params.csv")
+    df = getParamDistrib(file_name="results_robustness\\params.csv")
     df = pd.read_csv("results_robustness\\params.csv")
     plotParamsdf(df)
