@@ -9,8 +9,59 @@ import pickle
 import seaborn as sns
 import pandas as pd
 
+import multiprocessing
+
 sns.set_style("white")
  
+if __name__ == '__main__':  
+    #
+    # SETTINGS
+    #
+    ga_solutions = False
+    local_solutions = True
+
+    #base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt2")]#, os.path.join(".", "results_opt3")]
+    base_paths_opt = [os.path.join(".", "results_opt")]
+    num_models_fitness = 3
+    num_models_regions = 3
+
+
+    base_path_robustness = os.path.join(".", "results_robustness") 
+
+
+    #
+    # END OF SETTINGS
+    #
+
+
+    models = [one_bit_processor_ext, two_bit_processor_ext, three_bit_processor_ext]   
+
+    #folders = [os.path.join(base_path, "one_bit_model"), os.path.join(base_path, "two_bit_model"), os.path.join(base_path, "three_bit_model")]   
+    model_regions = []
+
+        
+    for model_index in range(num_models_regions):                    
+        #folder = folders[model_index]               
+        model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_index])                                       
+        solver = Solver(model)    
+
+        model_str = '0'+str(model_index+1)+'_'
+        region_files =  []
+        for base_path_opt in base_paths_opt:
+            if ga_solutions:
+                region_files.append(os.path.join(base_path_opt, model_str+"bioprocViableSet_IterGA.p"))
+            if local_solutions:
+                for i in range(10):
+                    region_files.append(os.path.join(base_path_opt, model_str+"bioproc_Region0ViableSet_Iter" + str(i+1) + ".p"))
+
+        viablePoints = []   
+        for region_file in region_files: 
+            viablePointsRegion = pickle.load(open(region_file, "rb"))   
+            print(len(viablePointsRegion))   
+            viablePoints.extend(viablePointsRegion)
+        print("Number of points ("+str(model_index+1)+"-bit):",len(viablePoints))
+        region = Region(viablePoints, model, "region")              
+        model_regions.append(region)                                                                        
         
 def calculateVolumes(model_index=0):    
     model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_index], avg_dev=30)    
@@ -83,6 +134,40 @@ def getCosts(number_points = 0, file_name = ""):
         df.to_csv(file_name, index=False)
 
     return df
+
+def getCostsParallel(number_points = 0, file_name = ""):     
+    rand_samples = []
+    for model_index in range(num_models_regions):
+        region = model_regions[model_index]   
+        if number_points:
+            samples = region.points[np.random.choice(region.points.shape[0], number_points, replace=False), :]            
+        else:
+            samples = region.points
+
+        rand_samples.append(samples)
+    
+    df = pd.DataFrame(columns=['Model id', 'Region id', 'cost'])
+    
+    pool = multiprocessing.Pool()
+            
+
+    for model_id in range(num_models_fitness):
+        model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_id])                                          
+        for region_id in range(num_models_regions):
+            costs = pool.map(model.eval, rand_samples[region_id])
+            
+            for costA in costs:
+                cost = -costA[0]
+                df = df.append({'Model id': model_id+1, 'Region id': region_id+1, 'cost':cost}, ignore_index=True)
+
+    pool.close()
+
+    if file_name:
+        df.to_csv(file_name, index=False)
+
+    return df
+
+
 
 def plotCostdf(df=None, number_points = 0):
     if not type(df):
@@ -302,62 +387,12 @@ def plotStochasticSimulations(number_points = 5):
 			plt.legend()			
 			plt.show()	 
             
-if __name__ == '__main__':  
-
-
-    #
-    # SETTINGS
-    #
-    ga_solutions = False
-    local_solutions = True
-
-    #base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt2")]#, os.path.join(".", "results_opt3")]
-    base_paths_opt = [os.path.join(".", "results_opt")]
-    num_models_fitness = 3
-    num_models_regions = 3
-
-
-    base_path_robustness = os.path.join(".", "results_robustness") 
-
-
-    #
-    # END OF SETTINGS
-    #
-
-
-    models = [one_bit_processor_ext, two_bit_processor_ext, three_bit_processor_ext]   
-
-    #folders = [os.path.join(base_path, "one_bit_model"), os.path.join(base_path, "two_bit_model"), os.path.join(base_path, "three_bit_model")]   
-    model_regions = []
-
-        
-    for model_index in range(num_models_regions):                    
-        #folder = folders[model_index]               
-        model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_index])                                       
-        solver = Solver(model)    
-
-        model_str = '0'+str(model_index+1)+'_'
-        region_files =  []
-        for base_path_opt in base_paths_opt:
-            if ga_solutions:
-                region_files.append(os.path.join(base_path_opt, model_str+"bioprocViableSet_IterGA.p"))
-            if local_solutions:
-                for i in range(10):
-                    region_files.append(os.path.join(base_path_opt, model_str+"bioproc_Region0ViableSet_Iter" + str(i+1) + ".p"))
-
-        viablePoints = []   
-        for region_file in region_files: 
-            viablePointsRegion = pickle.load(open(region_file, "rb"))   
-            print(len(viablePointsRegion))   
-            viablePoints.extend(viablePointsRegion)
-        print("Number of points ("+str(model_index+1)+"-bit):",len(viablePoints))
-        region = Region(viablePoints, model, "region")              
-        model_regions.append(region)       
+   
 
 
 
 
-
+if __name__ == "__main__":
 
 
     #calculateVolumes(model_index=0)  
@@ -371,13 +406,13 @@ if __name__ == '__main__':
     #plotStochasticSimulations()   
 
 
-    #df = getCosts(number_points = 5, file_name = "costs.csv")
+    #df = getCosts(number_points = 5, file_name = "results_robustness\\costs.csv")
 
 
-    #df = getCosts(number_points=5, file_name="results_robustness\\costs.csv")
-    #df = pd.read_csv("results_robustness\\costs.csv")
-    #plotCostdf(df)
+    #df = getCostsParallel(number_points=5, file_name="results_robustness\\costs_par.csv")
+    df = pd.read_csv("results_robustness\\costs_all.csv")
+    plotCostdf(df)
 
-    df = getParamDistrib(file_name="results_robustness\\params.csv")
-    df = pd.read_csv("results_robustness\\params.csv")
-    plotParamsdf(df)
+    #df = getParamDistrib(file_name="results_robustness\\params.csv")
+    #df = pd.read_csv("results_robustness\\params.csv")
+    #plotParamsdf(df)

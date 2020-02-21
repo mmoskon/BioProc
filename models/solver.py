@@ -121,7 +121,7 @@ class Solver:
                 #evaluate individuals
                 fits = self.toolbox.map(self.toolbox.evaluate, offspring)     
                 for fit, ind in zip(fits, offspring):      
-                    if self.model.isViable(ind, fit) and ind not in nominalValsMode:      
+                    if self.model.isViable(ind, fitness=fit) and ind not in nominalValsMode:      
                         nominalValsMode.append(ind)          
                     ind.fitness.values = fit      
                 #roulete wheel selection

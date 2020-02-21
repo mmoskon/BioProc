@@ -202,11 +202,11 @@ class BioProc:
         print(t_fitness) 
         return t_fitness,                       
         
-    def isViable(self, point, fitness=None): 
-        if fitness == None:  
+    def isViable(self, point, fitness=None):  
+        if fitness == None:
             fitness = self.eval(point)   
         #print(fitness[0])   
-        return fitness[0] >= self.threshold       
+        return fitness[0] >= self.threshold         
 
     def getHotStart(self, params_ff, params_addr):
         y0 = self.y0  
@@ -220,9 +220,10 @@ class BioProc:
         params_ff = candidate[0:8]        
         params_addr = candidate[8:]          
         
-        y0 = self.y0       
+        y0 = self.y0
+        
         if hot_start:
-            y0 = self.getHotStart(params_ff,params_addr)  
+            y0 = self.getHotStart(params_ff,params_addr)                
         
         Y = odeint(self.model_mode, y0, self.ts, args=(params_ff, params_addr))  
         """
@@ -232,29 +233,52 @@ class BioProc:
         """
 
         #print("simulating")     
+                      
+                                              
+                                           
+                                                                                                         
+                                  
         return Y
+    
+                                                     
+                                          
+                                             
+        
+                            
+                     
+                                                          
+        
+                                                                                 
+           
+                                                                                             
+                                                                                             
+                                                                                               
+           
 
-    def simulateStochastic(self, candidate,hot_start=True): 
+    def simulateStochastic(self, candidate, hot_start=True):
         multiplier = self.multiplier   
         omega = self.omega 
         
-                
         params_ff = candidate[0:8]          
         params_addr = candidate[8:] 
         
         y0 = self.y0 
         if hot_start:
-            y0 = self.getHotStart(params_ff,params_addr)        
-            
+            y0 = self.getHotStart(params_ff,params_addr) 
         y_conc = np.array(y0*omega).astype(int) 
-        print(y_conc) 
 
         Y_total = []
         Y_total.append(y_conc)
         t = 0 
         T = [] 
         T.append(t) 
-   
+        
+                          
+                     
+                                                                
+            
+                                                
+                      
 
         N = np.zeros((6*multiplier, 16*multiplier)) #6*multiplier species, 16*multiplier reactions  
         for i in range(multiplier):
@@ -305,11 +329,30 @@ class BioProc:
             else: #three_bit_processor_ext  
                 ds = [y_conc[11],y_conc[2],y_conc[6]] #not q3, q1, q2       
                 a[multiplier*12:] = addressing_stochastic_three_bit_model(y_conc, t, params_addr, omega) 
+                                       
+                                        
+                                      
+                                        
+                                                                   
+                                                                        
+                                                                    
+                                                                                
+            
+        
+        
+                          
+                                       
+                                         
+                     
+                                
 
             for i in range(multiplier):
                 y = y_conc[i*4:i*4+4] 
                 y = np.append(y, ds[i]) #to do 
                 y = np.append(y, clk) 
+            
+                                                        
+                                           
                 a[i*12:i*12+12] = ff_stochastic_model(y, t, params_ff, omega)    
                     
             asum = np.cumsum(a)
@@ -327,6 +370,28 @@ class BioProc:
             #update time
             t = t + tau  
             T.append(t)
+
+            
+                                      
+                                               
+                                      
+                                                                                 
+                    
+                               
+                            
+                    
+                                             
+        
+                            
+                             
+                                                                                        
+        
+                                  
+                                                        
+                                   
+                        
+                         
+                       
 
             
         T = np.array(T)
