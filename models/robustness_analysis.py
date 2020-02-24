@@ -22,8 +22,8 @@ if __name__ == '__main__':
 
     #base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt2")]#, os.path.join(".", "results_opt3")]
     base_paths_opt = [os.path.join(".", "results_opt")]
-    num_models_fitness = 3
-    num_models_regions = 3
+    num_models_fitness = 4
+    num_models_regions = 4
 
 
     base_path_robustness = os.path.join(".", "results_robustness") 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     #
 
 
-    models = [one_bit_processor_ext, two_bit_processor_ext, three_bit_processor_ext]   
+    models = [one_bit_processor_ext, two_bit_processor_ext, three_bit_processor_ext, four_bit_processor_ext]   
 
     #folders = [os.path.join(base_path, "one_bit_model"), os.path.join(base_path, "two_bit_model"), os.path.join(base_path, "three_bit_model")]   
     model_regions = []
@@ -276,7 +276,14 @@ def getParamDistrib(number_points = 0, file_name = ""):
 
         df = pd.concat([df1, df2, df3], ignore_index=True)
 
-    
+    if num_models_regions >= 4:
+
+        df4 = pd.DataFrame(rand_samples[3])
+        df4.columns = param_names
+        df4["Model id"] = 4
+
+        df = pd.concat([df1, df2, df3, df4], ignore_index=True)
+
     
     """
     for model_id in range(num_models_regions):
@@ -409,8 +416,8 @@ if __name__ == "__main__":
     #df = getCosts(number_points = 5, file_name = "results_robustness\\costs.csv")
 
 
-    #df = getCostsParallel(number_points=5, file_name="results_robustness\\costs_par.csv")
-    df = pd.read_csv("results_robustness\\costs_all.csv")
+    df = getCostsParallel(number_points=5, file_name="results_robustness\\costs_par.csv")
+    df = pd.read_csv("results_robustness\\costs_par.csv")
     plotCostdf(df)
 
     #df = getParamDistrib(file_name="results_robustness\\params.csv")

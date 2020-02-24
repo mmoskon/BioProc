@@ -48,6 +48,12 @@ class BioProc:
                 self.y0 = np.loadtxt('init3bit.txt')
             else:                
                 self.y0 = [0]*(self.multiplier*6) 
+        elif self.model_mode == four_bit_processor_ext:
+            self.multiplier = 4         
+            if load_init:
+                self.y0 = np.loadtxt('init4bit.txt')
+            else:                
+                self.y0 = [0]*(self.multiplier*6) 
         else: 
             sys.exit('Error: unvalid model mode')       
             
@@ -86,7 +92,7 @@ class BioProc:
    
             self.idealsFF.append(idFF)              
                                 
-        self.threshold = -30 if self.model_mode == one_bit_processor_ext else -20 if self.model_mode == two_bit_processor_ext else -18#self.getThreshold(avg_dev, plot_devs=plot_devs)                                             
+        self.threshold = -30 if self.model_mode == one_bit_processor_ext else -20 if self.model_mode == two_bit_processor_ext else -18 if self.model_mode == three_bit_processor_ext else -17 #self.getThreshold(avg_dev, plot_devs=plot_devs)                                             
         print(self.threshold) 
             
             
