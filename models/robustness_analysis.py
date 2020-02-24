@@ -21,7 +21,8 @@ if __name__ == '__main__':
     local_solutions = True
 
     #base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt2")]#, os.path.join(".", "results_opt3")]
-    base_paths_opt = [os.path.join(".", "results_opt")]
+    #base_paths_opt = [os.path.join(".", "results_opt")]
+    base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt_ziga")]
     num_models_fitness = 4
     num_models_regions = 4
 
@@ -416,10 +417,10 @@ if __name__ == "__main__":
     #df = getCosts(number_points = 5, file_name = "results_robustness\\costs.csv")
 
 
-    df = getCostsParallel(number_points=5, file_name="results_robustness\\costs_par.csv")
-    df = pd.read_csv("results_robustness\\costs_par.csv")
-    plotCostdf(df)
+    #df = getCostsParallel(number_points=5, file_name="results_robustness\\costs_par.csv")
+    #df = pd.read_csv("results_robustness\\costs_par.csv")
+    #plotCostdf(df)
 
-    #df = getParamDistrib(file_name="results_robustness\\params.csv")
-    #df = pd.read_csv("results_robustness\\params.csv")
-    #plotParamsdf(df)
+    df = getParamDistrib(file_name="results_robustness\\params.csv")
+    df = pd.read_csv("results_robustness\\params.csv")
+    plotParamsdf(df)
