@@ -75,14 +75,45 @@ def calculateVolumes(model_indexes=None):
         
         print(model.threshold)  
         solver = Solver(model)
-        _, vol_desc = solver.getViableVolume([model_regions[model_index]])           
-        vol_desc = str(model_index)
-
+        _, vol_desc = solver.getViableVolume([model_regions[model_index]])     
+        
         model_str = '0'+str(model_index+1)+'_'
     
         f = open(os.path.join(base_path_robustness, model_str+"viable_volume.txt"), "w")      
         f.write(vol_desc)   
-        f.close()      
+        f.close()    
+
+def plotVolumes(csv_file = "", model_indexes=None):  
+    if not csv_file:
+        
+        if model_indexes == None:
+            model_indexes = range(num_models_regions)
+        elif type(model_indexes) == int:
+            model_indexes = [model_indexes]
+
+        df = pd.DataFrame(columns = ["Model id", "Total", "Ratio"])
+
+        for model_index in model_indexes:
+            model_str = '0'+str(model_index+1)+'_'
+            f = open(os.path.join(base_path_robustness, model_str+"viable_volume.txt"))
+            f.readline()
+            f.readline()
+            total = float(f.readline().strip().split()[1])
+            ratio = float(f.readline().strip().split()[1])
+            df.append({"Model id":model_index+1, "Total":total, "Ratio":ratio}, ignore_index=True)
+        df.to_csv("volumes.csv", index=False)
+    else:
+        df = read_csv(csv_file)
+
+        sns.barplot(x = 'Model id', y = 'Rato', data = df, palette="Pastel1")
+        plt.ylabel('Volume')
+        plt.yscale('log')
+        #fig = plt.gcf()
+        #fig.set_size_inches([20,8])
+        plt.savefig(os.path.join(base_path_robustness, 'volumes.pdf'), bbox_inches = 'tight')
+        plt.show()
+
+    
 """
 def plotBoxPlots():  
     number_points = int(1e4)
