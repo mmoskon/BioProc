@@ -21,8 +21,8 @@ if __name__ == '__main__':
     local_solutions = True
 
     #base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt2")]#, os.path.join(".", "results_opt3")]
-    #base_paths_opt = [os.path.join(".", "results_opt")]
-    base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt_ziga")]
+    base_paths_opt = [os.path.join(".", "results_opt")]
+    #base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt_ziga")]
     num_models_fitness = 4
     num_models_regions = 4
 
@@ -64,21 +64,25 @@ if __name__ == '__main__':
         region = Region(viablePoints, model, "region")              
         model_regions.append(region)                                                                        
         
-def calculateVolumes(model_index=0):    
-    model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_index], avg_dev=30)    
+def calculateVolumes(model_indexes=None):    
+    if model_indexes == None:
+        model_indexes = range(num_models_regions)
+    elif type(model_indexes) == int:
+        model_indexes = [model_indexes]
+
+    for model_index in model_indexes:
+        model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_index], avg_dev=30)    
         
-    print(model.threshold)  
-    solver = Solver(model)
-    #folder = folders[model_index]
-    #print(folder)    
+        print(model.threshold)  
+        solver = Solver(model)
+        _, vol_desc = solver.getViableVolume([model_regions[model_index]])           
+        vol_desc = str(model_index)
+
+        model_str = '0'+str(model_index+1)+'_'
     
-    _, vol_desc = solver.getViableVolume([model_regions[model_index]])           
-    
-    model_str = '0'+str(model_index+1)+'_'
-    
-    f = open(os.path.join(base_path_robustness, model_str+"viable_volume.txt"), "w")      
-    f.write(vol_desc)   
-    f.close()      
+        f = open(os.path.join(base_path_robustness, model_str+"viable_volume.txt"), "w")      
+        f.write(vol_desc)   
+        f.close()      
 """
 def plotBoxPlots():  
     number_points = int(1e4)
@@ -177,7 +181,34 @@ def plotCostdf(df=None, number_points = 0):
     df['Model id'] = df['Model id'].astype(int)
     df['Region id'] = df['Region id'].astype(int)
 
-    sns.violinplot(x="Model id", y="cost", hue="Region id", data=df, palette="Pastel1")
+    _, axes = plt.subplots(1,2, gridspec_kw={'width_ratios': [2, 1]})
+
+
+    g=sns.violinplot(x="Model id", y="cost", hue="Region id", data=df, palette="Pastel1", ax = axes[0])
+    g.legend_.remove()
+    axes[0].set_ylabel('Costs')
+
+    thresholds = [30, 20, 18, 17]
+    #thresholds = [30, 20, 20, 20]
+
+    df_comp = pd.DataFrame(columns =['Model id', 'Region id', 'compatible'])
+
+
+    for model_id in range(1,num_models_fitness+1):        
+        for region_id in range(1,num_models_regions+1):
+            threshold = max(thresholds[region_id-1], thresholds[model_id-1])
+            n = df[(df['Model id']== model_id) & (df['Region id']== region_id)].shape[0]
+            comp = df[(df['Model id']== model_id) & (df['Region id']== region_id) & (df['cost'] <= threshold)].shape[0]
+            df_comp = df_comp.append({'Model id': model_id, 'Region id': region_id, 'compatible': comp/n}, ignore_index=True)
+
+    sns.barplot(x = 'Model id', y = 'compatible', data = df_comp, hue="Region id", palette="Pastel1", ax = axes[1])
+    axes[1].set_ylabel('Fractions')
+    l = axes[1].get_legend()
+    l.set_bbox_to_anchor((1, 0.75))
+      
+        
+    fig = plt.gcf()
+    fig.set_size_inches([20,8])
     plt.savefig(os.path.join(base_path_robustness, 'cost_distrib_sns.pdf'), bbox_inches = 'tight')
     plt.show()
 
@@ -403,10 +434,8 @@ def plotStochasticSimulations(number_points = 5):
 if __name__ == "__main__":
 
 
-    #calculateVolumes(model_index=0)  
-    #calculateVolumes(model_index=1)    
-    #calculateVolumes(model_index=2)      
-
+    calculateVolumes()  
+    
     #plotCost(number_points = 5)  
 
     #plotParamDistrib()
@@ -418,9 +447,9 @@ if __name__ == "__main__":
 
 
     #df = getCostsParallel(number_points=5, file_name="results_robustness\\costs_par.csv")
-    #df = pd.read_csv("results_robustness\\costs_par.csv")
+    #df = pd.read_csv("results_robustness\\costs.csv")
     #plotCostdf(df)
 
-    df = getParamDistrib(file_name="results_robustness\\params.csv")
-    df = pd.read_csv("results_robustness\\params.csv")
-    plotParamsdf(df)
+    #df = getParamDistrib(file_name="results_robustness\\params.csv")
+    #df = pd.read_csv("results_robustness\\params.csv")
+    #plotParamsdf(df)
