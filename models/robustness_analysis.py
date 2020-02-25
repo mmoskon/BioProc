@@ -64,6 +64,7 @@ if __name__ == '__main__':
         region = Region(viablePoints, model, "region")              
         model_regions.append(region)                                                                        
         
+
 def calculateVolumes(model_indexes=None):    
     if model_indexes == None:
         model_indexes = range(num_models_regions)
@@ -83,35 +84,77 @@ def calculateVolumes(model_indexes=None):
         f.write(vol_desc)   
         f.close()    
 
-def plotVolumes(csv_file = "", model_indexes=None):  
-    if not csv_file:
+def calculateVolumesRepeats(model_indexes=None, repeats = 10):    
+    if model_indexes == None:
+        model_indexes = range(num_models_regions)
+    elif type(model_indexes) == int:
+        model_indexes = [model_indexes]
+
+    df = pd.DataFrame(columns=["Model id", "Volume", "Total", "Ratio"])
+
+    for model_index in model_indexes:
+        model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_index], avg_dev=30)    
         
-        if model_indexes == None:
-            model_indexes = range(num_models_regions)
-        elif type(model_indexes) == int:
-            model_indexes = [model_indexes]
+        print(model.threshold)  
+        solver = Solver(model)
 
-        df = pd.DataFrame(columns = ["Model id", "Total", "Ratio"])
+        for _ in range(repeats):
+            (volume, total, ratio), _ = solver.getViableVolume([model_regions[model_index]])        
+            df = df.append({"Model id":model_index+1, "Volume": volume, "Total":total, "Ratio":ratio}, ignore_index=True)
+    
+    df.to_csv(os.path.join(base_path_robustness, 'volumes.csv'), index=False)
 
-        for model_index in model_indexes:
-            model_str = '0'+str(model_index+1)+'_'
-            f = open(os.path.join(base_path_robustness, model_str+"viable_volume.txt"))
-            f.readline()
-            f.readline()
-            total = float(f.readline().strip().split()[1])
-            ratio = float(f.readline().strip().split()[1])
-            df.append({"Model id":model_index+1, "Total":total, "Ratio":ratio}, ignore_index=True)
-        df.to_csv("volumes.csv", index=False)
-    else:
-        df = read_csv(csv_file)
+def plotVolumesFromCsv(file_name = ""):
+    if not file_name:
+        file_name = os.path.join(base_path_robustness, 'volumes.csv')
+    df = pd.read_csv(file_name)
+    model_indexes = list(df["Model id"].unique())
+    model_indexes.sort()
+    df_avg = pd.DataFrame(columns=["Model id", "Volume", "Total", "Ratio"])   
 
-        sns.barplot(x = 'Model id', y = 'Rato', data = df, palette="Pastel1")
-        plt.ylabel('Volume')
-        plt.yscale('log')
-        #fig = plt.gcf()
-        #fig.set_size_inches([20,8])
-        plt.savefig(os.path.join(base_path_robustness, 'volumes.pdf'), bbox_inches = 'tight')
-        plt.show()
+    for model_index in model_indexes:
+        df_model = df[df["Model id"]==model_index]
+        n = df_model.shape[0]
+        df_avg = df_avg.append({"Model id":model_index, 
+                                "Volume": sum(df_model.Volume)/n, 
+                                "Total":sum(df_model.Total)/n, 
+                                "Ratio":sum(df_model.Ratio)/n}, ignore_index=True)
+    df_avg.to_csv(os.path.join(base_path_robustness, 'volumes_avg.csv'), index=False)    
+
+    sns.barplot(x = 'Model id', y = 'Ratio', data = df_avg, palette="Pastel1")
+    plt.ylabel('Volume [a.u.]')
+    plt.yscale('log')
+    #fig = plt.gcf()
+    #fig.set_size_inches([20,8])
+    plt.savefig(os.path.join(base_path_robustness, 'volumes_avg.pdf'), bbox_inches = 'tight')
+    plt.show()
+
+
+
+def plotVolumesFromTxt(model_indexes=None):  
+    if model_indexes == None:
+        model_indexes = range(num_models_regions)
+    elif type(model_indexes) == int:
+        model_indexes = [model_indexes]
+
+    df = pd.DataFrame(columns = ["Model id", "Total", "Ratio"])
+
+    for model_index in model_indexes:
+        model_str = '0'+str(model_index+1)+'_'
+        f = open(os.path.join(base_path_robustness, model_str+"viable_volume.txt"))
+        f.readline()
+        volume = float(f.readline().strip().split(":")[-1])
+        total = float(f.readline().strip().split(":")[-1])
+        ratio = float(f.readline().strip().split(":")[-1])
+        df = df.append({"Model id":model_index+1, "Volume": volume, "Total":total, "Ratio":ratio}, ignore_index=True)
+
+    sns.barplot(x = 'Model id', y = 'Ratio', data = df, palette="Pastel1")
+    plt.ylabel('Volume [a.u.]')
+    plt.yscale('log')
+    #fig = plt.gcf()
+    #fig.set_size_inches([20,8])
+    plt.savefig(os.path.join(base_path_robustness, 'volumes.pdf'), bbox_inches = 'tight')
+    plt.show()
 
     
 """
@@ -465,8 +508,11 @@ def plotStochasticSimulations(number_points = 5):
 if __name__ == "__main__":
 
 
-    calculateVolumes()  
-    
+    #calculateVolumes()  
+    #plotVolumesFromTxt()
+    calculateVolumesRepeats()
+    plotVolumesFromCsv()
+
     #plotCost(number_points = 5)  
 
     #plotParamDistrib()

@@ -268,11 +268,15 @@ class Solver:
             ratio = count/sample_size   
             volume = volume + ratio*volB            
     
-        description = "Bounding box volume " + str(volB) + "\n" 
-        description += "Volume " + str(volume) + "\n" 
-        description += "Total volume " + str(self.model.getTotalVolume()) + "\n"    
-        description +=  "Volume ratio:" + str(volume/self.model.getTotalVolume())       
-        return volume, description    
+        total = self.model.getTotalVolume()
+        ratio = volume/total
+
+        description = "Bounding box volume:" + str(volB) + "\n" 
+        description += "Volume:" + str(volume) + "\n" 
+        description += "Total volume:" + str(total) + "\n"    
+        description +=  "Volume ratio:" + str(ratio)       
+        
+        return (volume, total, ratio), description    
 
     def setBoxColors(self, bp, nRegions, ax, colors = ["#0E74C8", "#15A357", "r", "k"]):
         colorLen = len(colors)
