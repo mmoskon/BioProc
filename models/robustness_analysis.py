@@ -127,7 +127,12 @@ def plotVolumesFromCsv(file_name = ""):
     #fig = plt.gcf()
     #fig.set_size_inches([20,8])
     plt.savefig(os.path.join(base_path_robustness, 'volumes_avg.pdf'), bbox_inches = 'tight')
-    plt.show()
+    plt.close()
+
+    #sns.violinplot(x="Model id", y="Ratio", data=df_avg, palette="Pastel1")
+    #plt.ylabel('Volume [a.u.]')
+    #plt.yscale('log')
+    #plt.show()
 
 
 
@@ -510,7 +515,9 @@ if __name__ == "__main__":
 
     #calculateVolumes()  
     #plotVolumesFromTxt()
-    calculateVolumesRepeats()
+    
+    calculateVolumesRepeats(repeats = 3)
+    
     plotVolumesFromCsv()
 
     #plotCost(number_points = 5)  
@@ -522,11 +529,12 @@ if __name__ == "__main__":
 
     #df = getCosts(number_points = 5, file_name = "results_robustness\\costs.csv")
 
+    
+    df = getCostsParallel(file_name="results_robustness\\costs_par.csv")
+    df = pd.read_csv("results_robustness\\costs_par.csv")
+    plotCostdf(df)
 
-    #df = getCostsParallel(number_points=5, file_name="results_robustness\\costs_par.csv")
-    #df = pd.read_csv("results_robustness\\costs.csv")
-    #plotCostdf(df)
-
-    #df = getParamDistrib(file_name="results_robustness\\params.csv")
-    #df = pd.read_csv("results_robustness\\params.csv")
-    #plotParamsdf(df)
+    df = getParamDistrib(file_name="results_robustness\\params.csv")
+    df = pd.read_csv("results_robustness\\params.csv")
+    plotParamsdf(df)
+    
