@@ -432,6 +432,7 @@ def plotParamsdf(df=None, number_points = 0):
     
     fig.set_size_inches([20,12])
     plt.savefig(os.path.join(base_path_robustness, 'params_distrib_sns.pdf'), bbox_inches = 'tight')   
+    plt.savefig(os.path.join(base_path_robustness, 'params_distrib_eps.pdf'), bbox_inches = 'tight')   
     plt.show()
 
 
@@ -560,8 +561,8 @@ def plotStochasticSimulations(from_file = True, number_points = 3, plotFlipflops
     
     plt.gcf().set_size_inches(15,12) 
     plt.savefig(os.path.join(base_path_robustness, 'ssa.pdf'), bbox_inches = 'tight')
-
-    pickle.dump(fig, open("selected_points\\plot_SSA.pickle", "wb"))
+    if pickle_dump:
+        pickle.dump(fig, open("selected_points\\plot_SSA.pickle", "wb"))
 
     plt.show()  
 
@@ -577,12 +578,12 @@ if __name__ == "__main__":
     
     #df = getCostsParallel(file_name="results_robustness\\costs_par.csv")
     #df = pd.read_csv("results_robustness\\costs_par.csv")
-    """
+    
     df = pd.read_csv("results_robustness\\costs_both_2.csv")
     plotCostdf(df)
 
     df = getParamDistrib(file_name="results_robustness\\params_both.csv")
     df = pd.read_csv("results_robustness\\params.csv")
     plotParamsdf(df)
-    """
-    plotStochasticSimulations(pickle_dump=False)   
+    
+    #plotStochasticSimulations(pickle_dump=False)   

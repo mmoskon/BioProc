@@ -93,17 +93,20 @@ def simulate_program(program_name, t_end, N, params_ff, params_addr, params_prot
     
     
     if ax != plt:
-        ax.set_xlabel('time [h]')
-        ax.set_ylabel('concentrations')
+        ax.set_xlabel('Time [h]')
+        ax.set_ylabel('Concentrations [nM]')
 
-    ax.legend(legend, loc='upper left')
+    ax.legend(legend, ncol=10, 
+          loc='upper center',
+          bbox_to_anchor=(0.5, 0.95),
+          bbox_transform=plt.gcf().transFigure)
 
     if ax == plt:
         plt.savefig("figs\\"+program_name.split(".")[0]+".pdf", bbox_inches = 'tight')
         plt.savefig("figs\\"+program_name.split(".")[0]+".png")
         
-        plt.xlabel('time [h]')
-        plt.ylabel('concentrations')
+        plt.xlabel('Time [h]')
+        plt.ylabel('Concentrations [nM]')
 
         plt.show()
 
