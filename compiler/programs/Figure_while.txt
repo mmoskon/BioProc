@@ -1,2 +1,2 @@
-generate A
-while A generate C
+generate condition
+while condition generate C

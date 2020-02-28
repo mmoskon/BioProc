@@ -11,9 +11,10 @@ import pandas as pd
 
 import multiprocessing
 
-sns.set_style("white")
  
 if __name__ == '__main__':  
+    sns.set_style("white")
+
     #
     # SETTINGS
     #
@@ -21,8 +22,8 @@ if __name__ == '__main__':
     local_solutions = True
 
     #base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt2")]#, os.path.join(".", "results_opt3")]
-    base_paths_opt = [os.path.join(".", "results_opt")]
-    #base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt_ziga")]
+    #base_paths_opt = [os.path.join(".", "results_opt")]
+    base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt_ziga")]
     num_models_fitness = 4
     num_models_regions = 4
 
@@ -479,7 +480,7 @@ def plotParamDistrib(number_points = 0):
     plt.show()      
     
 
-    
+"""   
 def plotStochasticSimulations(number_points = 5):
  	
 	print("Plotting stochastic simulations")
@@ -504,37 +505,84 @@ def plotStochasticSimulations(number_points = 5):
 			#plt.legend(loc="upper left")
 			plt.legend()			
 			plt.show()	 
+"""           
+def plotStochasticSimulations(from_file = True, number_points = 3, plotFlipflops = False, pickle_dump=False): 
+     
+    print("Plotting stochastic simulations") 
+    
+    fig, axs = plt.subplots(3, number_points)     
+
+    for model_index in range(3):  
+        print(model_index) 
+        region = model_regions[model_index] 
+        model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_index], plot_fitness=False, plot_devs=False)   
+        
+        samples = []
+        if not from_file:
+            samples = region.points[np.random.choice(region.points.shape[0], number_points, replace=False), :]    
+        else:
+            for i in range(number_points):
+                samples.append(pickle.load(open("selected_points\\model" + str(model_index + 1) + "sample" + str(i + 1) + ".p", "rb")))      
             
-   
+        
+        sample_num = 0
+        for sample in samples:
+            print(sample) 
+            T, Y = model.simulateStochastic(sample)  
+            Y_ode = model.simulate(sample)   
 
+            colors = plt.rcParams["axes.prop_cycle"]() #get color iterator                      
+            for i in range(model_index + 1):  
+                
+                if plotFlipflops:               
+                    c = next(colors)["color"]
+                    axs[model_index, sample_num].plot(T, Y[:, i*4 + 2], label='q'+str(i+1), color=c, alpha=0.7) 
+                    axs[model_index, sample_num].plot(model.ts, Y_ode[:, i*4 + 2], color=c, linestyle="--")  
+                    #axs[model_index, sample_num].get_xaxis().set_visible(False)
+            
+            
+            for i in range(2*(model_index + 1)):
+                c = next(colors)["color"]
+                axs[model_index,sample_num].plot(T, Y[:, -(2*(model_index + 1) - i)], label="i"+str(i + 1), color=c, alpha=0.7)  
+                axs[model_index,sample_num].plot(model.ts, Y_ode[:, -(2*(model_index + 1) - i)], color=c, linestyle="--")  
+            
+            if not from_file:
+                pickle.dump(sample, open("selected_points\\test_model" + str(model_index + 1) + "sample" + str(sample_num + 1) + ".p", "wb+")) 
+            
+            sample_num += 1 
+            
+    for i in range(len(samples)):
+        axs[2, i].set(xlabel='Time [h]') 
+    for i in range(3):
+        axs[i, 0].set(ylabel='Concentration [nM]')   
+        #plt.legend(loc="upper left")
+        #plt.legend()           
+    
+    plt.gcf().set_size_inches(15,12) 
+    plt.savefig(os.path.join(base_path_robustness, 'ssa.pdf'), bbox_inches = 'tight')
 
+    pickle.dump(fig, open("selected_points\\plot_SSA.pickle", "wb"))
 
+    plt.show()  
+
+    
 
 if __name__ == "__main__":
 
 
-    #calculateVolumes()  
-    #plotVolumesFromTxt()
+    #calculateVolumesRepeats(repeats = 3)
     
-    calculateVolumesRepeats(repeats = 3)
+    #plotVolumesFromCsv()
     
-    plotVolumesFromCsv()
-
-    #plotCost(number_points = 5)  
-
-    #plotParamDistrib()
-
-    #plotStochasticSimulations()   
-
-
-    #df = getCosts(number_points = 5, file_name = "results_robustness\\costs.csv")
-
     
-    df = getCostsParallel(file_name="results_robustness\\costs_par.csv")
-    df = pd.read_csv("results_robustness\\costs_par.csv")
+    #df = getCostsParallel(file_name="results_robustness\\costs_par.csv")
+    #df = pd.read_csv("results_robustness\\costs_par.csv")
+    """
+    df = pd.read_csv("results_robustness\\costs_both_2.csv")
     plotCostdf(df)
 
-    df = getParamDistrib(file_name="results_robustness\\params.csv")
+    df = getParamDistrib(file_name="results_robustness\\params_both.csv")
     df = pd.read_csv("results_robustness\\params.csv")
     plotParamsdf(df)
-    
+    """
+    plotStochasticSimulations(pickle_dump=False)   

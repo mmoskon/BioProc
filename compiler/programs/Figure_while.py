@@ -1,20 +1,20 @@
 from bioproc.hill_functions import *
 def model(Y, T, params):
-	a0, not_a0, q0, not_q0,a1, not_a1, q1, not_q1,a2, not_a2, q2, not_q2,i1, i2, i3, i4, i5, i6,A,C,=Y
+	a0, not_a0, q0, not_q0,a1, not_a1, q1, not_q1,a2, not_a2, q2, not_q2,i1, i2, i3, i4, i5, i6,C,condition,=Y
 	alpha1, alpha2, alpha3, alpha4, delta1, delta2, Kd, n, deltaE, KM,alpha_a, delta_a, Kd_a, n_a,KD_cond,=params
 	clk = get_clock(T)
-	prog_delta_C=0.1
-	prog_alpha_A=10
-	prog_n_A=2
-	prog_Kd_A=10
 	prog_Kd_C=10
-	prog_delta_A=0.1
-	prog_n_C=2
 	prog_alpha_C=10
-	dA_dt=+prog_alpha_A*activate_1(i1,prog_Kd_A,prog_n_A)-prog_delta_A*A
+	prog_delta_condition=0.1
+	prog_n_condition=2
+	prog_Kd_condition=10
+	prog_n_C=2
+	prog_delta_C=0.1
+	prog_alpha_condition=10
+	dcondition_dt=+prog_alpha_condition*activate_1(i1,prog_Kd_condition,prog_n_condition)-prog_delta_condition*condition
 	dC_dt=+prog_alpha_C*activate_1(i2,prog_Kd_C,prog_n_C)-prog_delta_C*C
-	cond0=A
-	cond1=A
+	cond0=condition
+	cond1=condition
 	RESET0=0 if T > 1 else 100
 	SET0=0 
 	RESET1=max((induction(i3, cond1, KD_cond),)) if T > 1 else 100
@@ -48,4 +48,4 @@ def model(Y, T, params):
 	di4_dt = alpha_a * activate_2(q0, q2, Kd_a, n_a) - delta_a * i4
 	di5_dt = alpha_a * activate_2(not_q0, q1, Kd_a, n_a) - delta_a * i5
 	di6_dt = alpha_a * activate_2(not_q1, q2, Kd_a, n_a) - delta_a * i6
-	return [da0_dt,dnot_a0_dt,dq0_dt,dnot_q0_dt,da1_dt,dnot_a1_dt,dq1_dt,dnot_q1_dt,da2_dt,dnot_a2_dt,dq2_dt,dnot_q2_dt,di1_dt,di2_dt,di3_dt,di4_dt,di5_dt,di6_dt,dA_dt,dC_dt]
+	return [da0_dt,dnot_a0_dt,dq0_dt,dnot_q0_dt,da1_dt,dnot_a1_dt,dq1_dt,dnot_q1_dt,da2_dt,dnot_a2_dt,dq2_dt,dnot_q2_dt,di1_dt,di2_dt,di3_dt,di4_dt,di5_dt,di6_dt,dC_dt,dcondition_dt]

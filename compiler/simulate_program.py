@@ -5,6 +5,7 @@ from scipy.integrate import odeint
 import numpy as np
 import importlib
 import seaborn as sns
+import pickle
 
 
 def simulate_program(program_name, t_end, N, params_ff, params_addr, params_proteolysis, params_condition, params_prog, n_bits, ax=plt, plot_clock = True, plot_instructions = False, plot_ops = True, alpha_plot = 0.75):
@@ -164,8 +165,11 @@ if __name__ == '__main__':
 
     # other params - outputs of GA
 
-    points = np.loadtxt('selected_points.txt')[:3]
-
+    #points = np.loadtxt('selected_points//selected_points_old.txt')[:3]
+    p31 = pickle.load(open("selected_points\\model3sample1.p", "rb"))      
+    p32 = pickle.load(open("selected_points\\model3sample2.p", "rb"))      
+    p33 = pickle.load(open("selected_points\\model3sample3.p", "rb"))      
+    points = np.array([p31, p32, p33])
     
     #with plt.style.context('fivethirtyeight'):
     sns.set_style("white")
