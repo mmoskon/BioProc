@@ -21,9 +21,9 @@ if __name__ == '__main__':
     ga_solutions = False
     local_solutions = True
 
-    #base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt2")]#, os.path.join(".", "results_opt3")]
-    #base_paths_opt = [os.path.join(".", "results_opt")]
-    base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt_ziga")]
+    
+    base_paths_opt = [os.path.join(".", "results_opt")]
+    #base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt_rep1"), os.path.join(".", "results_opt_rep2")]
     num_models_fitness = 4
     num_models_regions = 4
 
@@ -254,22 +254,31 @@ def getCostsParallel(number_points = 0, file_name = ""):
 
 
 
-def plotCostdf(df=None, number_points = 0):
+def plotCostdf(df=None, number_points = 0, normalize=True):
     if not type(df):
         df = getCosts(number_points)
     
     df['Model id'] = df['Model id'].astype(int)
     df['Region id'] = df['Region id'].astype(int)
 
-    _, axes = plt.subplots(1,2, gridspec_kw={'width_ratios': [2, 1]})
+    
+    thresholds = [30, 20, 18, 17]
+    #thresholds = [30, 20, 20, 20]
 
+    if normalize:
+        for model_id in range(1,num_models_fitness+1):
+            locs = df['Model id']== model_id
+            df.loc[locs,'cost'] /= thresholds[model_id-1]
+
+    _, axes = plt.subplots(1,2, gridspec_kw={'width_ratios': [2, 1]})
 
     g=sns.violinplot(x="Model id", y="cost", hue="Region id", data=df, palette="Pastel1", ax = axes[0])
     g.legend_.remove()
-    axes[0].set_ylabel('Costs')
+    if normalize:
+        axes[0].set_ylabel('Normalized costs [a.u.]')    
+    else:
+        axes[0].set_ylabel('Costs')
 
-    thresholds = [30, 20, 18, 17]
-    #thresholds = [30, 20, 20, 20]
 
     df_comp = pd.DataFrame(columns =['Model id', 'Region id', 'compatible'])
 
@@ -280,6 +289,9 @@ def plotCostdf(df=None, number_points = 0):
             n = df[(df['Model id']== model_id) & (df['Region id']== region_id)].shape[0]
             comp = df[(df['Model id']== model_id) & (df['Region id']== region_id) & (df['cost'] <= threshold)].shape[0]
             df_comp = df_comp.append({'Model id': model_id, 'Region id': region_id, 'compatible': comp/n}, ignore_index=True)
+
+    
+
 
     sns.barplot(x = 'Model id', y = 'compatible', data = df_comp, hue="Region id", palette="Pastel1", ax = axes[1])
     axes[1].set_ylabel('Fractions')
@@ -431,8 +443,7 @@ def plotParamsdf(df=None, number_points = 0):
         sns.violinplot(y = param_names[param_id], x="Model id", data=df[[param_names[param_id], "Model id"]], palette="Pastel1", ax = ax)
     
     fig.set_size_inches([20,12])
-    plt.savefig(os.path.join(base_path_robustness, 'params_distrib_sns.pdf'), bbox_inches = 'tight')   
-    plt.savefig(os.path.join(base_path_robustness, 'params_distrib_eps.pdf'), bbox_inches = 'tight')   
+    plt.savefig(os.path.join(base_path_robustness, 'params_distrib_sns.pdf'), bbox_inches = 'tight')
     plt.show()
 
 
@@ -569,21 +580,13 @@ def plotStochasticSimulations(from_file = True, number_points = 3, plotFlipflops
     
 
 if __name__ == "__main__":
-
-
-    #calculateVolumesRepeats(repeats = 3)
-    
-    #plotVolumesFromCsv()
-    
-    
-    #df = getCostsParallel(file_name="results_robustness\\costs_par.csv")
-    #df = pd.read_csv("results_robustness\\costs_par.csv")
-    
-    df = pd.read_csv("results_robustness\\costs_both_2.csv")
+ 
+    ##df = getCostsParallel(file_name="results_robustness\\costs.csv")  
+    df = pd.read_csv("results_robustness\\costs.csv")
     plotCostdf(df)
 
-    df = getParamDistrib(file_name="results_robustness\\params_both.csv")
-    df = pd.read_csv("results_robustness\\params.csv")
-    plotParamsdf(df)
+    ##df = getParamDistrib(file_name="results_robustness\\params.csv")
+    #df = pd.read_csv("results_robustness\\params.csv")
+    #plotParamsdf(df)
     
-    #plotStochasticSimulations(pickle_dump=False)   
+    ##plotStochasticSimulations(pickle_dump=False)   

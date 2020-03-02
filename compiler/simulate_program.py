@@ -92,9 +92,9 @@ def simulate_program(program_name, t_end, N, params_ff, params_addr, params_prot
         legend += ['clk']
     
     
-    if ax != plt:
-        ax.set_xlabel('Time [h]')
-        ax.set_ylabel('Concentrations [nM]')
+    #if ax != plt:
+    #    ax.set_xlabel('Time [h]')
+    #    ax.set_ylabel('Concentrations [nM]')
 
     ax.legend(legend, ncol=10, 
           loc='upper center',
@@ -149,9 +149,9 @@ if __name__ == '__main__':
     #program_name = "programs\\Figure_halt.txt"
     #program_name, t_end = "programs\\Figure_jump_unconditional.txt", 120
     #program_name, t_end = "programs\\Figure_jump_conditional_false.txt", 120
-    #program_name, t_end, prog_delta = "programs\\Figure_jump_conditional_true.txt", 120, 0.08
-    #program_name, t_end, prog_delta = "programs\\Figure_if_true.txt", 120, 0.08
-    #program_name, t_end, prog_delta = "programs\\Figure_if_false.txt", 120, 0.08
+    #program_name, t_end, prog_delta = "programs\\Figure_jump_conditional_true.txt", 120, 0.1
+    #program_name, t_end, prog_delta = "programs\\Figure_if_true.txt", 120, 0.1
+    #program_name, t_end, prog_delta = "programs\\Figure_if_false.txt", 120, 0.1
     program_name, t_end = "programs\\Figure_while.txt", 180
 
     plot_multi = True
@@ -196,6 +196,12 @@ if __name__ == '__main__':
             params_addr = list(params[8:])   
 
             simulate_program(program_name, t_end, N, params_ff, params_addr, params_proteolysis, params_condition, params_prog, n_bits, ax, plot_instructions=True, plot_ops = plot_ops)
+
+            if i == 0:
+                ax.set_ylabel('Concentrations [nM]')  
+            ax.set_xlabel('Time [h]')
+
+
         plt.gcf().set_size_inches(15,5)
         plt.savefig("figs\\"+program_name.split(".")[0]+".pdf", bbox_inches = 'tight')
         plt.show()  
