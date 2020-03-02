@@ -8,7 +8,7 @@ Implementation of computational models and their analysis is available in `model
 * `models/bioproc/proc_models.py`: implementation of different processor topologies, 
 * `models/bioproc/proc_opt.py`: analysis of viable spaces for a selected topology,
 * `models/robustness_analysis.py`: analysis of robustness of the obtained solutions.
-* `models/analyse_proc.ipynb`: interactive python notebook with an example of analysis.
+* [`models/analyse_proc.ipynb`](`models/analyse_proc.ipynb`): interactive python notebook with an example of analysis of different topologies,
 
 An example of the model analysis
 
@@ -16,7 +16,7 @@ An example of the model analysis
 Implementation of compiler and examples of different programs and their analysis is available in `compiler` folder. The main files are as follows:
 * `compiler/generate_model.py`: implementation of the biological compiler,
 * `compiler/simulate_program.py`: simulator that uses the compiler to generate an ODE-based model and than simulates its dynamics with the given parameter set,
-* [`compiler/simulate_processor.ipynb`](`../compiler/simulate_processor.ipynb`): interactive python notebook with the description of the biological processor language syntax and with the examples of different programs and their analysis.
+* [`compiler/simulate_processor.ipynb`](`compiler/simulate_processor.ipynb`): interactive python notebook with the description of the biological processor language syntax and with the examples of different programs and their analysis.
 
 ## Data
 Data and results are available in the following folders:
@@ -27,8 +27,8 @@ Data and results are available in the following folders:
 
 ## Examples
 Examples are available as interactive python notebooks:
-* [`models/analyse_proc.ipynb`](`../models/analyse_proc.ipynb`): interactive python notebook with an example of analysis of different topologies,
-* [`programs/simulate_processor.ipynb`](`../programs/simulate_processor.ipynb`): interactive python notebook with the description of the biological processor language syntax and with the examples of different programs and their analysis.
+* [`models/analyse_proc.ipynb`](`models/analyse_proc.ipynb`): interactive python notebook with an example of analysis of different topologies,
+* [`programs/simulate_processor.ipynb`](`compiler/simulate_processor.ipynb`): interactive python notebook with the description of the biological processor language syntax and with the examples of different programs and their analysis.
 
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
 
