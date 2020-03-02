@@ -25,7 +25,7 @@ Data and results are available in the following folders:
 
 ## Examples
 Examples are available as interactive Python notebooks:
-* [`programs/simulate_processor.ipynb`](compiler/simulate_processor.ipynb): interactive Python notebook with the description of the biological processor language syntax and with the examples of different programs and their analysis.
+* [`compiler/simulate_processor.ipynb`](compiler/simulate_processor.ipynb): interactive Python notebook with the description of the biological processor language syntax and with the examples of different programs and their analysis.
 * [`models/analyse_proc.ipynb`](models/analyse_proc.ipynb): interactive Python notebook with an example of analysis of different topologies.
 
 ## Prerequisites
