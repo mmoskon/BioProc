@@ -265,21 +265,10 @@ def plotCostdf(df=None, number_points = 0, normalize=True):
     thresholds = [30, 20, 18, 17]
     #thresholds = [30, 20, 20, 20]
 
-    if normalize:
-        for model_id in range(1,num_models_fitness+1):
-            locs = df['Model id']== model_id
-            df.loc[locs,'cost'] /= thresholds[model_id-1]
+   
 
     _, axes = plt.subplots(1,2, gridspec_kw={'width_ratios': [2, 1]})
-
-    g=sns.violinplot(x="Model id", y="cost", hue="Region id", data=df, palette="Pastel1", ax = axes[0])
-    g.legend_.remove()
-    if normalize:
-        axes[0].set_ylabel('Normalized costs [a.u.]')    
-    else:
-        axes[0].set_ylabel('Costs')
-
-
+    
     df_comp = pd.DataFrame(columns =['Model id', 'Region id', 'compatible'])
 
 
@@ -293,12 +282,32 @@ def plotCostdf(df=None, number_points = 0, normalize=True):
     
 
 
-    sns.barplot(x = 'Model id', y = 'compatible', data = df_comp, hue="Region id", palette="Pastel1", ax = axes[1])
+    g = sns.barplot(x = 'Model id', y = 'compatible', data = df_comp, hue="Region id", palette="Pastel1", ax = axes[1])
+    g.legend_.remove()
     axes[1].set_ylabel('Fractions')
-    l = axes[1].get_legend()
-    l.set_bbox_to_anchor((1, 0.75))
-      
-        
+    #l = axes[1].get_legend()
+    #l.set_bbox_to_anchor((1, 0.75))
+
+    if normalize:
+        for model_id in range(1,num_models_fitness+1):
+            locs = df['Model id']== model_id
+            df.loc[locs,'cost'] /= thresholds[model_id-1]
+
+    g=sns.violinplot(x="Model id", y="cost", hue="Region id", data=df, palette="Pastel1", ax = axes[0])
+    #g.legend_.remove()
+    g.legend(ncol=10, loc='upper center', bbox_to_anchor=(0.5, 0.95), title="Region id")
+    if normalize:
+        axes[0].set_ylabel('Normalized costs [a.u.]')    
+    else:
+        axes[0].set_ylabel('Costs')
+
+
+    """
+    plt.legend(ncol=10, 
+          loc='upper center',
+          bbox_to_anchor=(0.5, 0.95),
+          bbox_transform=plt.gcf().transFigure)
+    """    
     fig = plt.gcf()
     fig.set_size_inches([20,8])
     plt.savefig(os.path.join(base_path_robustness, 'cost_distrib_sns.pdf'), bbox_inches = 'tight')
