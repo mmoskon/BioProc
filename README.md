@@ -14,7 +14,7 @@ Implementation of computational models and their analysis is available in `model
 Implementation of the compiler and examples of different programs and their analysis is available in `compiler` folder. The main files are as follows:
 * `compiler/generate_model.py`: implementation of the biological compiler,
 * `compiler/simulate_program.py`: simulator that uses the compiler to generate an ODE-based model and simulates its dynamics with the given parameter set,
-* [`compiler/simulate_processor.ipynb`](compiler/simulate_processor.ipynb): interactive Python notebook with the description of the biological processor language syntax and with the examples of different programs and their analysis.
+* [`compiler/simulate_processor.ipynb`](compiler/simulate_processor.ipynb): interactive Python notebook with the description of the biological compiler, the processor language syntax and with the examples of different programs and their analysis.
 
 ## Data
 Data and results are available in the following folders:
@@ -25,7 +25,7 @@ Data and results are available in the following folders:
 
 ## Examples
 Examples are available as interactive Python notebooks:
-* [`compiler/simulate_processor.ipynb`](compiler/simulate_processor.ipynb): interactive Python notebook with the description of the biological processor language syntax and with the examples of different programs and their analysis.
+* [`compiler/simulate_processor.ipynb`](compiler/simulate_processor.ipynb): interactive Python notebook with the description of the biological compiler, the processor language syntax and with the examples of different programs and their analysis.
 * [`models/analyse_proc.ipynb`](models/analyse_proc.ipynb): interactive Python notebook with an example of analysis of different topologies.
 
 ## Prerequisites
