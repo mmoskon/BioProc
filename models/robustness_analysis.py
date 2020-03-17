@@ -11,9 +11,13 @@ import pandas as pd
 
 import multiprocessing
 
+
  
 if __name__ == '__main__':  
     sns.set_style("white")
+    flatui = ['#d9d9d9','#bdbdbd','#969696','#636363']
+    #sns.palplot(sns.color_palette(flatui))
+    sns.set_palette(flatui)
 
     #
     # SETTINGS
@@ -122,7 +126,7 @@ def plotVolumesFromCsv(file_name = ""):
                                 "Ratio":sum(df_model.Ratio)/n}, ignore_index=True)
     df_avg.to_csv(os.path.join(base_path_robustness, 'volumes_avg.csv'), index=False)    
 
-    sns.barplot(x = 'Model id', y = 'Ratio', data = df_avg, palette="Pastel1")
+    sns.barplot(x = 'Model id', y = 'Ratio', data = df_avg)#, palette="Pastel1")
     plt.ylabel('Volume [a.u.]')
     plt.yscale('log')
     #fig = plt.gcf()
@@ -154,7 +158,7 @@ def plotVolumesFromTxt(model_indexes=None):
         ratio = float(f.readline().strip().split(":")[-1])
         df = df.append({"Model id":model_index+1, "Volume": volume, "Total":total, "Ratio":ratio}, ignore_index=True)
 
-    sns.barplot(x = 'Model id', y = 'Ratio', data = df, palette="Pastel1")
+    sns.barplot(x = 'Model id', y = 'Ratio', data = df)#, palette="Pastel1")
     plt.ylabel('Volume [a.u.]')
     plt.yscale('log')
     #fig = plt.gcf()
@@ -282,7 +286,7 @@ def plotCostdf(df=None, number_points = 0, normalize=True):
     
 
 
-    g = sns.barplot(x = 'Model id', y = 'compatible', data = df_comp, hue="Region id", palette="Pastel1", ax = axes[1])
+    g = sns.barplot(x = 'Model id', y = 'compatible', data = df_comp, hue="Region id", ax = axes[1]) #, palette="Pastel1")
     g.legend_.remove()
     axes[1].set_ylabel('Fractions')
     #l = axes[1].get_legend()
@@ -293,7 +297,7 @@ def plotCostdf(df=None, number_points = 0, normalize=True):
             locs = df['Model id']== model_id
             df.loc[locs,'cost'] /= thresholds[model_id-1]
 
-    g=sns.violinplot(x="Model id", y="cost", hue="Region id", data=df, palette="Pastel1", ax = axes[0])
+    g=sns.violinplot(x="Model id", y="cost", hue="Region id", data=df, ax = axes[0]) #, palette="Pastel1")
     #g.legend_.remove()
     g.legend(ncol=10, loc='upper center', bbox_to_anchor=(0.5, 0.95), title="Region id")
     if normalize:
@@ -449,7 +453,7 @@ def plotParamsdf(df=None, number_points = 0):
     for param_id in range(len(param_names)):
         ax = axes.flat[param_id]
 
-        sns.violinplot(y = param_names[param_id], x="Model id", data=df[[param_names[param_id], "Model id"]], palette="Pastel1", ax = ax)
+        sns.violinplot(y = param_names[param_id], x="Model id", data=df[[param_names[param_id], "Model id"]], ax = ax) #,palette="Pastel1")
     
     fig.set_size_inches([20,12])
     plt.savefig(os.path.join(base_path_robustness, 'params_distrib_sns.pdf'), bbox_inches = 'tight')
@@ -528,10 +532,18 @@ def plotStochasticSimulations(number_points = 5):
 			plt.show()	 
 """           
 def plotStochasticSimulations(from_file = True, number_points = 3, plotFlipflops = False, pickle_dump=False): 
+
+    sns.set_style("white")
+    #flatui = ['#f7f7f7','#d9d9d9','#bdbdbd','#969696','#737373','#525252','#252525']
+    #flatui = ['#bdbdbd','#969696','#737373','#525252','#252525','#000000']
+    flatui = ['#d9d9d9','#bdbdbd','#969696','#737373','#525252','#252525']
+    #sns.palplot(sns.color_palette(flatui))
+    sns.set_palette(flatui)
+    
      
     print("Plotting stochastic simulations") 
     
-    fig, axs = plt.subplots(3, number_points)     
+    fig, axs = plt.subplots(3, number_points, sharey='row')     
 
     for model_index in range(3):  
         print(model_index) 
@@ -579,6 +591,12 @@ def plotStochasticSimulations(from_file = True, number_points = 3, plotFlipflops
         #plt.legend(loc="upper left")
         #plt.legend()           
     
+
+    plt.legend(ncol=10, 
+          loc='upper center',
+          bbox_to_anchor=(0.5, 0.95),
+          bbox_transform=plt.gcf().transFigure)
+
     plt.gcf().set_size_inches(15,12) 
     plt.savefig(os.path.join(base_path_robustness, 'ssa.pdf'), bbox_inches = 'tight')
     if pickle_dump:
@@ -591,11 +609,11 @@ def plotStochasticSimulations(from_file = True, number_points = 3, plotFlipflops
 if __name__ == "__main__":
  
     ##df = getCostsParallel(file_name="results_robustness\\costs.csv")  
-    df = pd.read_csv("results_robustness\\costs.csv")
-    plotCostdf(df)
+    #df = pd.read_csv("results_robustness\\costs.csv")
+    #plotCostdf(df)
 
     ##df = getParamDistrib(file_name="results_robustness\\params.csv")
     #df = pd.read_csv("results_robustness\\params.csv")
     #plotParamsdf(df)
     
-    ##plotStochasticSimulations(pickle_dump=False)   
+    plotStochasticSimulations(pickle_dump=False)   
