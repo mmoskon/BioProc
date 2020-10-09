@@ -1,0 +1,9 @@
+compiler/__pycache__/
+models/__pycache__/
+*.py[cod]
+*$py.class
+
+compiler/.ipynb_checkpoints
+models/.ipynb_checkpoints
+
+.vscode
