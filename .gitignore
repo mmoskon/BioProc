@@ -1,9 +1,13 @@
 compiler/__pycache__/
+compiler/bioproc/__pycache__/
+compiler/programs/__pycache__/
 models/__pycache__/
+models/bioproc/__pycache__/
 *.py[cod]
 *$py.class
 
 compiler/.ipynb_checkpoints
 models/.ipynb_checkpoints
+models/results_robustness/.ipynb_checkpoints
 
 .vscode
