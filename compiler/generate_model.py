@@ -11,7 +11,7 @@ CommandLine:
     commands+=Command[';']
 ;
 Command:
-    If | While | Generate | Add | Sub
+    If | While | Generate | Add | Sub | DoWhile | Jump | JumpIf | Halt
 ;
 If:
     'IF' condition=ID commands+=Command['^']
