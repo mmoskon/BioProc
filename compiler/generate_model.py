@@ -1,11 +1,11 @@
 from collections import defaultdict
 import numpy as np
-from textx import metamodel_from_str, get_children_of_type
+from textx import metamodel_from_str
 
 # Grammar for processor's DSL
 grammar = """
 Program:
-    lines*=CommandLine['\r\n']
+    lines*=CommandLine[/\r\n|\n/]
 ;
 CommandLine:
     commands+=Command[';']
@@ -278,15 +278,12 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
     code.append("\tclk = get_clock(T)\n")
 
 
-
-    ## program
-    f_prog = open(program_name)
-
     addr = 1
     prog = defaultdict(str)
     prog_params = set()
     operands = set()
 
+    # Read and parse program according to grammar
     parsed_program = model.model_from_file(program_name)
     for line in parsed_program.lines:
         for command in line.commands:
