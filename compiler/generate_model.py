@@ -11,7 +11,7 @@ CommandLine:
     commands+=Command[';']
 ;
 Command:
-    If | While | Generate | Add | Sub | DoWhile | Jump | JumpIf | Halt
+    If | While | Generate | Add | Sub | DoWhile | Jump | JumpIf | Halt | Nop
 ;
 If:
     'IF' condition=ID commands+=Command['^']
@@ -39,6 +39,9 @@ JumpIf:
 ;
 Halt:
     'HALT'
+;
+Nop:
+    'NOP'
 ;
 """
 model = metamodel_from_str(grammar, ignore_case=True, ws=[" ", "\t"])
