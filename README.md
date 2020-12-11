@@ -42,6 +42,7 @@ The source code is written in Python 3.7 using the following modules and librari
 * `mpl_toolkits`
 * `peakutils`
 * `multiprocessing`
+* 'textx'
 
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
 

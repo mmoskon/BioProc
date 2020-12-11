@@ -1,5 +1,53 @@
 from collections import defaultdict
 import numpy as np
+from textx import metamodel_from_str
+
+# Grammar for processor's DSL
+grammar = """
+Program:
+    lines*=CommandLine[/\r\n|\n/]
+;
+CommandLine:
+    commands+=Command[';']
+;
+Command:
+    If | While | Generate | Add | Sub | DoWhile | Jump | JumpIf | Halt | Nop
+;
+If:
+    'IF' condition=ID commands+=Command['^']
+;
+While:
+    'WHILE' condition=ID commands+=Command['^']
+;
+DoWhile:
+    'DO-WHILE' condition=ID commands+=Command['^']
+;
+Generate:
+    'GENERATE' var=ID
+;
+Add:
+    'ADD' v1=ID ',' v2=ID ',' v3=ID
+;
+Sub:
+    'SUB' v1=ID ',' v2=ID ',' v3=ID
+;
+Jump:
+    'JUMP'
+;
+JumpIf:
+    'JUMPIF' condition=ID
+;
+Halt:
+    'HALT'
+;
+Nop:
+    'NOP'
+;
+"""
+model = metamodel_from_str(grammar, ignore_case=True, ws=[" ", "\t"])
+
+def cname(o):
+    return o.__class__.__name__
 
 def from_addr_to_i(addr, n_bits = 3):
     if n_bits == 3:
@@ -106,6 +154,112 @@ def from_i_to_RS(i_src, i_dst, n_bits = 3):
     return R,S
 
 
+def do_command(command,condition,operands, addr,inhibition,R,S, prog_params, prog, n_bits):
+    instr = cname(command).lower()
+    if instr == "if" or instr == "do-while":
+        if instr == "if":
+            i_src = "i" + str(addr)
+            i_dst = "i" + str(addr + 1)
+            inhibition.append(True)
+        else:  # do-while
+            i_src = "i" + str(addr + 1)
+            i_dst = "i" + str(addr)
+            inhibition.append(False)
+
+        r, s = from_i_to_RS(i_src, i_dst, n_bits=n_bits)
+        R.append(r)
+        S.append(s)
+
+        condition.append(command.condition)
+        operands.add(command.condition)
+        for cmnd in command.commands:
+            do_command(cmnd, condition, operands, addr, inhibition, R, S, prog_params, prog, n_bits)
+
+    if instr == "while":
+        # preverim, ce je izpolnjen pogoj, ce ni skocim naprej
+        i_src = "i" + str(addr)
+        i_dst = "i" + str(addr + 1)
+        inhibition.append(True)
+        r, s = from_i_to_RS(i_src, i_dst, n_bits=n_bits)
+        R.append(r)
+        S.append(s)
+        condition.append(command.condition)
+
+        # brezpogojno skocim nazaj, kjer bom spet preveril pogoj
+        # lahko pa tudi pogojno skocim nazaj
+        # kjer brez dodatnih stroskov ponovno preverjam enak pogoj
+        i_src = "i" + str(addr + 1)
+        i_dst = "i" + str(addr)
+        inhibition.append(False)
+        r, s = from_i_to_RS(i_src, i_dst, n_bits=n_bits)
+        R.append(r)
+        S.append(s)
+        condition.append(command.condition)
+
+        operands.add(command.condition)
+        for cmnd in command.commands:
+            do_command(cmnd, condition, operands, addr, inhibition, R, S, prog_params, prog,  n_bits)
+
+    if instr == 'nop':
+        pass
+    elif instr == 'generate':
+        o = command.var
+        operands.add(o)
+
+        alpha = "prog_alpha_" + o
+        Kd = "prog_Kd_" + o
+        n = "prog_n_" + o
+
+        prog_params |= {alpha, Kd, n}
+
+        prog[o] += "+" + alpha + "*activate_1(i" + str(addr) + ",prog_Kd_" + o + ",prog_n_" + o + ")"
+
+    elif instr == 'add' or instr == 'sub':
+        o = command.v1
+        operands.add(o)
+        op1 = command.v2
+        operands.add(op1)
+        op2 = command.v3
+        operands.add(op2)
+
+        alpha = "prog_alpha_" + o
+        Kd = "prog_Kd_" + o
+        n = "prog_n_" + o
+
+        prog_params |= {alpha, Kd, n}
+        if instr == 'add':
+            # prog[o] += alpha+"*activate_3(i"+str(addr)+","+op1+','+op2+",prog_Kd_"+o+",prog_n_"+o+")"
+            prog[o] += "+" + alpha + "*activate_2(i" + str(addr) + "," + op1 + ",prog_Kd_" + o + ",prog_n_" + o + ")"
+            prog[o] += "+" + alpha + "*activate_2(i" + str(addr) + "," + op2 + ",prog_Kd_" + o + ",prog_n_" + o + ")"
+        else:
+            prog[o] += "+" + alpha + "*hybrid_AAR(i" + str(
+                addr) + "," + op1 + ',' + op2 + ",prog_Kd_" + o + ",prog_n_" + o + ")"
+    elif instr == "halt":
+        i_src = "i" + str(addr + 1)
+        i_dst = "i" + str(addr)
+        inhibition.append(True)
+        condition.append(0)
+        r, s = from_i_to_RS(i_src, i_dst, n_bits=n_bits)
+        R.append(r)
+        S.append(s)
+        # TODO deal with this break
+
+    elif instr == "jump" or instr == "jumpif":
+
+        i_src = "i" + str(addr)
+        i_dst = "i" + str(addr + 1)
+
+        if instr == "jump":
+            inhibition.append(True)
+            condition.append("0")
+        else:  # jumpif
+            inhibition.append(False)
+            condition.append(command.condition)
+            operands.add(command.condition)
+
+        r, s = from_i_to_RS(i_src, i_dst, n_bits=n_bits)
+        R.append(r)
+        S.append(s)
 
 
 ####################################
@@ -127,134 +281,18 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
     code.append("\tclk = get_clock(T)\n")
 
 
-
-    ## program
-    f_prog = open(program_name)
-
     addr = 1
     prog = defaultdict(str)
     prog_params = set()
     operands = set()
 
-
-    for line in f_prog:
-        for l in line.strip().split(";"):        
-            try:
-                l = l.split(",")
-                ops = l[0].split()[1:] + l[1:]    
-                instr = (l[0].split()[0]).lower().strip()   
-            except:
-                instr = l[0].strip()
-        
-            if instr == "if" or instr=="do-while":
-                
-                if instr == "if":
-                    i_src = "i"+str(addr)
-                    i_dst = "i"+str(addr+1)
-                    inhibition.append(True)
-                else: # do-while
-                    i_src = "i"+str(addr + 1)
-                    i_dst = "i"+str(addr)
-                    inhibition.append(False)
-                
-                r,s  = from_i_to_RS(i_src, i_dst, n_bits = n_bits)
-                R.append(r)
-                S.append(s)
-                
-                condition.append(ops[0])
-                operands.add(ops[0])
-                instr = ops[1]    
-                ops = ops[2:]
-            elif instr == "while":
-                # preverim, ce je izpolnjen pogoj, ce ni skocim naprej
-                i_src = "i"+str(addr)
-                i_dst = "i"+str(addr+1)
-                inhibition.append(True)
-                r,s  = from_i_to_RS(i_src, i_dst, n_bits = n_bits)
-                R.append(r)
-                S.append(s)
-                condition.append(ops[0])
-            
-                # brezpogojno skocim nazaj, kjer bom spet preveril pogoj
-                # lahko pa tudi pogojno skocim nazaj
-                # kjer brez dodatnih stroskov ponovno preverjam enak pogoj
-                i_src = "i"+str(addr + 1)
-                i_dst = "i"+str(addr)
-                inhibition.append(False)
-                r,s  = from_i_to_RS(i_src, i_dst, n_bits = n_bits)
-                R.append(r)
-                S.append(s)
-                condition.append(ops[0])
-                
-                operands.add(ops[0])
-                instr = ops[1]    
-                ops = ops[2:]
-            
-            if instr == 'nop':
-                pass
-            elif instr == 'generate':
-                o = ops[0]
-                operands.add(o)
-
-                alpha = "prog_alpha_" + o 
-                Kd = "prog_Kd_" + o
-                n = "prog_n_" + o
-                
-                prog_params |= {alpha, Kd, n}
-                
-                prog[o] += "+"+alpha+"*activate_1(i"+str(addr)+",prog_Kd_"+o+",prog_n_"+o+")"
-        
-            elif instr == 'add' or instr == 'sub':
-                o = ops[0].strip()
-                operands.add(o)
-                op1 = ops[1].strip()
-                operands.add(op1)
-                op2 = ops[2].strip()
-                operands.add(op2)
-                
-                alpha = "prog_alpha_" + o 
-                Kd = "prog_Kd_" + o
-                n = "prog_n_" + o
-                
-                prog_params |= {alpha, Kd, n}
-                if instr == 'add':
-                    #prog[o] += alpha+"*activate_3(i"+str(addr)+","+op1+','+op2+",prog_Kd_"+o+",prog_n_"+o+")"
-                    prog[o] += "+"+alpha+"*activate_2(i"+str(addr)+","+op1+",prog_Kd_"+o+",prog_n_"+o+")"
-                    prog[o] += "+"+alpha+"*activate_2(i"+str(addr)+","+op2+",prog_Kd_"+o+",prog_n_"+o+")"
-                else:
-                    prog[o] += "+"+alpha+"*hybrid_AAR(i"+str(addr)+","+op1+','+op2+",prog_Kd_"+o+",prog_n_"+o+")"
-            elif instr == "halt":
-                i_src = "i"+str(addr + 1)
-                i_dst = "i"+str(addr)
-                inhibition.append(True)
-                condition.append(0)
-                r, s = from_i_to_RS(i_src, i_dst, n_bits = n_bits)
-                R.append(r)
-                S.append(s)
-
-                break
-            elif instr == "jump" or instr=="jumpif":
-                
-                i_src = "i"+str(addr)
-                i_dst = "i"+str(addr+1)
-
-                if instr == "jump":   
-                    inhibition.append(True)
-                    condition.append("0")
-                else: # jumpif
-                    inhibition.append(False)
-                    condition.append(ops[0])
-                    operands.add(ops[0])
-                
-                r,s  = from_i_to_RS(i_src, i_dst, n_bits = n_bits)
-                R.append(r)
-                S.append(s)
-                
-                
-            
-            
+    # Read and parse program according to grammar
+    parsed_program = model.model_from_file(program_name)
+    for line in parsed_program.lines:
+        for command in line.commands:
+            do_command(command, condition,operands, addr,inhibition,R,S, prog_params, prog,  n_bits)
         addr += 1
-        
+
     for o in operands: # dodam razgradnjo tudi za tiste, ki sicer nimajo enacbe
         prog[o] += "-prog_delta_"+o +"*"+o
         prog_params.add("prog_delta_" + o)
