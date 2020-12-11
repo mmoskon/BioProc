@@ -37,6 +37,9 @@ Jump:
 JumpIf:
     'JUMPIF' condition=ID
 ;
+Halt:
+    'HALT'
+;
 """
 model = metamodel_from_str(grammar, ignore_case=True, ws=[" ", "\t"])
 
