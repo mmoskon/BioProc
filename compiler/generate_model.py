@@ -20,7 +20,7 @@ Basic:
     Generate | Add | Sub | Jump | Nop
 ;
 If:
-    'IF' condition=ID commands+=Basic['^']
+    'IF' condition=ID commands+=Basic['^'] ('ELSE' commands_else+=Basic['^'])*
 ;
 While:
     'WHILE' condition=ID commands+=Basic['^']
