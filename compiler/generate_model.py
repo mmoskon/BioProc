@@ -11,16 +11,22 @@ CommandLine:
     commands+=Command[';']
 ;
 Command:
-    If | While | Generate | Add | Sub | DoWhile | Jump | JumpIf | Halt | Nop
+    Conditional | Basic | Halt
+;
+Conditional:
+    If | While | DoWhile | JumpIf
+;
+Basic:
+    Generate | Add | Sub | Jump | Nop
 ;
 If:
-    'IF' condition=ID commands+=Command['^']
+    'IF' condition=ID commands+=Basic['^']
 ;
 While:
-    'WHILE' condition=ID commands+=Command['^']
+    'WHILE' condition=ID commands+=Basic['^']
 ;
 DoWhile:
-    'DO-WHILE' condition=ID commands+=Command['^']
+    'DO-WHILE' condition=ID commands+=Basic['^']
 ;
 Generate:
     'GENERATE' var=ID
