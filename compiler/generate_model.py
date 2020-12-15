@@ -161,7 +161,11 @@ def from_i_to_RS(i_src, i_dst, n_bits = 3):
 
 
 def do_command(command,condition,operands, addr,inhibition,R,S, prog_params, prog, n_bits):
-    instr = cname(command).lower()
+    if isinstance(command, str):
+        #  commands without extra parameters are passed as string and not as a command object.
+        instr = command.lower()
+    else:
+        instr = cname(command).lower()
     if instr == "if" or instr == "do-while":
         if instr == "if":
             i_src = "i" + str(addr)
