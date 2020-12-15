@@ -252,7 +252,7 @@ def do_command(command,condition,operands, addr,inhibition,R,S, prog_params, pro
         r, s = from_i_to_RS(i_src, i_dst, n_bits=n_bits)
         R.append(r)
         S.append(s)
-        # TODO deal with this break
+        return True
 
     elif instr == "jump" or instr == "jumpif":
 
@@ -299,17 +299,19 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
     # Read and parse program according to grammar
     parsed_program = model.model_from_file(program_name)
     for line in parsed_program.lines:
+        do_not_continue = None
         for command in line.commands:
-            do_command(command, condition,operands, addr,inhibition,R,S, prog_params, prog,  n_bits)
+            do_not_continue = do_command(command, condition,operands, addr,inhibition,R,S, prog_params, prog,  n_bits)
+            if do_not_continue:
+                # if do_command returns something it means it got a halt instruction so we should stop parsing commands
+                break
+        if do_not_continue:
+            break
         addr += 1
 
     for o in operands: # dodam razgradnjo tudi za tiste, ki sicer nimajo enacbe
         prog[o] += "-prog_delta_"+o +"*"+o
         prog_params.add("prog_delta_" + o)
-
-    #print(prog)
-    #print(prog_params)
-
 
     for p in prog_params:
         value = eval("_".join(p.split("_")[:-1]))
@@ -324,24 +326,9 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
     for op in variables_list:        
         variables_prog +=op+","
 
-
-    ## jumps
-    
-    #jump_src = ""
-    #jump_dst = ""
-
-    #jump_src=[0,1,1]
-    #jump_dst = [1,1,1]
-
-    
-    #R,S = from_addr_to_RS(jump_src, jump_dst, n_bits)
-
-    #print(R,S)
     for i in range(len(condition)):
         if condition[i]:
             code.append("\tcond"+str(i)+"="+condition[i]+"\n")
-
-
 
     for j in range(n_bits):
         str_R = "\tRESET"+str(j)+"="
@@ -372,9 +359,6 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
                     if s:
                         str_S_inputs += "induction("+s+", cond"+str(i)+", KD_cond),"
 
-
-
-
         if str_R_inputs:
             str_R += "max(("+str_R_inputs+"))"
         else:
@@ -389,35 +373,6 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
         
         code.append(str_R)
         code.append(str_S)
-
-
-
-
-
-    """
-    
-    for i in range(len(condition)):
-        cond = condition[i]
-        inhibit = inhibition[i]
-        r = R[i]
-        s = S[i]
-
-
-    if condition:
-        code.append("\tcond="+condition+"\n")
-    for i in range(n_bits):
-        if not condition:
-            code.append("\tRESET"+str(i)+"="+str(R[i])+" if T > 1 else 100\n")
-            code.append("\tSET"+str(i)+"="+str(S[i])+"\n")
-        else:
-            if inhibition:
-                code.append("\tRESET"+str(i)+"=inhibition("+str(R[i])+", cond, KD_cond) if T > 1 else 100\n")
-                code.append("\tSET"+str(i)+"=inhibition("+str(S[i])+", cond, KD_cond)\n")
-            else:
-                code.append("\tRESET"+str(i)+"=induction("+str(R[i])+", cond, KD_cond) if T > 1 else 100\n")
-                code.append("\tSET"+str(i)+"=induction("+str(S[i])+", cond, KD_cond)\n")
-    """
-
 
     # flip_flops
     f = open("flip_flop")
