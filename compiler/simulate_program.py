@@ -16,7 +16,7 @@ def simulate_program(program_name, t_end, N, params_ff, params_addr, params_prot
 
 
     generate_model(program_name, model_name, n_bits, prog_alpha, prog_delta, prog_n, prog_Kd)      
-    model = importlib.import_module(model_name.replace("\\","."))
+    model = importlib.import_module(model_name.replace("/","."))
 
     f_description = open(model_name+"description.txt")
     ops = f_description.readline().strip().split(",")[:-1]
@@ -28,8 +28,10 @@ def simulate_program(program_name, t_end, N, params_ff, params_addr, params_prot
     # solving
     if n_bits == 3:
         Y0 = np.array([0]*(18+len(ops)))
-    else: #if n_bits == 4:
+    elif n_bits == 4:
         Y0 = np.array([0]*(24+len(ops)))
+    else:
+        Y0 = np.array([0]*(30+len(ops)))
 
     T = np.linspace(0, t_end, N)
     Y = odeint(model.model, Y0, T, args=params)
@@ -45,7 +47,7 @@ def simulate_program(program_name, t_end, N, params_ff, params_addr, params_prot
             i4 = Y[:,-3-len(ops)]
             i5 = Y[:,-2-len(ops)]
             i6 = Y[:,-1-len(ops)]
-        else: #if n_bits == 4:
+        elif n_bits == 4:
             i1 = Y[:,-8-len(ops)]
             i2 = Y[:,-7-len(ops)]
             i3 = Y[:,-6-len(ops)]
@@ -54,7 +56,17 @@ def simulate_program(program_name, t_end, N, params_ff, params_addr, params_prot
             i6 = Y[:,-3-len(ops)]
             i7 = Y[:,-2-len(ops)]
             i8 = Y[:,-1-len(ops)]
-
+        else: #elif n_bits == 5:
+            i1 = Y[:,-10-len(ops)]
+            i2 = Y[:,-9-len(ops)]
+            i3 = Y[:,-8-len(ops)]
+            i4 = Y[:,-7-len(ops)]
+            i5 = Y[:,-6-len(ops)]
+            i6 = Y[:,-5-len(ops)]
+            i7 = Y[:,-4-len(ops)]
+            i8 = Y[:,-3-len(ops)]
+            i9 = Y[:,-2-len(ops)]
+            i10 = Y[:,-1-len(ops)]
 
         ax.plot(T,i1, alpha=alpha_plot)
         ax.plot(T,i2, alpha=alpha_plot)
@@ -65,15 +77,24 @@ def simulate_program(program_name, t_end, N, params_ff, params_addr, params_prot
         if n_bits == 4:
             ax.plot(T,i7, alpha=alpha_plot)
             ax.plot(T,i8, alpha=alpha_plot)
-
+        elif n_bits == 5:
+            ax.plot(T,i7, alpha=alpha_plot)
+            ax.plot(T,i8, alpha=alpha_plot)
+            ax.plot(T,i9, alpha=alpha_plot)
+            ax.plot(T,i10, alpha=alpha_plot)
+    
     
         
         if n_bits == 3:
             ax.legend(ops+['i1','i2','i3','i4','i5','i6'], loc='upper left')
             legend += ['i1','i2','i3','i4','i5','i6']
-        else:
+        elif n_bits == 4: #else:
             ax.legend(ops+['i1','i2','i3','i4','i5','i6','i7','i8'], loc='upper left')
             legend += ['i1','i2','i3','i4','i5','i6','i7','i8']
+        elif n_bits == 5: #else:
+            ax.legend(ops+['i1','i2','i3','i4','i5','i6','i7','i8','i9','i10'], loc='upper left')
+            legend += ['i1','i2','i3','i4','i5','i6','i7','i8','i9','i10']
+
 
     if plot_ops:
         i = -len(ops)
@@ -117,10 +138,10 @@ if __name__ == '__main__':
 
     # simulation parameters
 
-    t_end = 200
-    N = 1000
+    t_end = 290 #200
+    N = 1200 #1000
 
-    n_bits = 3
+    n_bits = 5
 
     plot_ops = True
 
@@ -131,14 +152,14 @@ if __name__ == '__main__':
     
 
 
-    #program_name = "programs\\program_add.txt"
+    #program_name = "programs/program_add.txt"
     #program_name = "programs\\program_add_nop.txt"
     #program_name = "programs\\program_sub.txt"
     #program_name = "programs\\program_sub_one.txt"
     #program_name = "programs\\program_sub_halt.txt"
     #program_name = "programs\\program_add_halt.txt"
     #program_name = "programs\\program_if.txt"
-    #program_name = "programs\\program_if_false.txt"
+    program_name = "programs/program_if_false.txt"
     #program_name = "programs\\program_add_multi.txt"
     #program_name = "programs\\program_while.txt"
     #
@@ -152,7 +173,7 @@ if __name__ == '__main__':
     #program_name, t_end, prog_delta = "programs\\Figure_jump_conditional_true.txt", 120, 0.1
     #program_name, t_end, prog_delta = "programs\\Figure_if_true.txt", 120, 0.1
     #program_name, t_end, prog_delta = "programs\\Figure_if_false.txt", 120, 0.1
-    program_name, t_end = "programs\\Figure_while.txt", 180
+    #program_name, t_end = "programs/Figure_while.txt", 180
 
     plot_multi = True
 
@@ -169,9 +190,9 @@ if __name__ == '__main__':
     # other params - outputs of GA
 
     #points = np.loadtxt('selected_points//selected_points_old.txt')[:3]
-    p31 = pickle.load(open("selected_points\\model3sample1.p", "rb"))      
-    p32 = pickle.load(open("selected_points\\model3sample2.p", "rb"))      
-    p33 = pickle.load(open("selected_points\\model3sample3.p", "rb"))      
+    p31 = pickle.load(open("selected_points/model3sample1.p", "rb"))      
+    p32 = pickle.load(open("selected_points/model3sample2.p", "rb"))      
+    p33 = pickle.load(open("selected_points/model3sample3.p", "rb"))      
     points = np.array([p31, p32, p33])
     
     #with plt.style.context('fivethirtyeight'):
@@ -203,7 +224,7 @@ if __name__ == '__main__':
 
 
         plt.gcf().set_size_inches(15,5)
-        plt.savefig("figs\\"+program_name.split(".")[0]+".pdf", bbox_inches = 'tight')
+        plt.savefig("figs/"+program_name.split(".")[0]+".pdf", bbox_inches = 'tight')
         plt.show()  
     
     else:

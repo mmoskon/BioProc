@@ -32,6 +32,27 @@ def from_addr_to_i(addr, n_bits = 3):
             return "i7"
         else:
             return "i8"
+    elif n_bits == 5:
+        if addr == [0,0,0,0,0]:
+            return "i1"
+        elif addr == [1,0,0,0,0]:
+            return "i2"
+        elif addr == [1,1,0,0,0]:
+            return "i3"
+        elif addr == [1,1,1,0,0]:
+            return "i4"
+        elif addr == [1,1,1,1,0]:
+            return "i5"
+        elif addr == [1,1,1,1,1]:
+            return "i6"
+        elif addr == [0,1,1,1,1]:
+            return "i7"
+        elif addr == [0,0,1,1,1]:
+            return "i8"
+        elif addr == [0,0,0,1,1]:
+            return "i9"
+        else:
+            return "i10"
 
     
 
@@ -66,6 +87,28 @@ def from_i_to_addr(i, n_bits = 3):
             return [0,0,1,1]
         else:
             return [0,0,0,1]
+    elif n_bits == 5:
+        if i == "i1":
+            return [0,0,0,0,0]
+        elif i == "i2":
+            return [1,0,0,0,0]
+        elif i == "i3":
+            return [1,1,0,0,0]           
+        elif i == "i4":
+            return [1,1,1,0,0]            
+        elif i == "i5":
+            return [1,1,1,1,0]
+        elif i == "i6":
+            return [1,1,1,1,1]
+        elif i == "i7":
+            return [0,1,1,1,1]
+        elif i == "i8":
+            return [0,0,1,1,1]
+        elif i == "i9":
+            return [0,0,0,1,1]
+        else:
+            return [0,0,0,0,1]
+
 
 def from_addr_to_RS(jump_src, jump_dst, n_bits = 3): 
     i_src = from_addr_to_i(jump_src, n_bits)

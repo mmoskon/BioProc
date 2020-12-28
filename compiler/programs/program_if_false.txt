@@ -1,2 +1,10 @@
 generate A
-if B add C, A, B
+if A add C, A, B
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+generate C

@@ -205,6 +205,28 @@ def four_bit_simple_addressing_ode_model(Y, T, params):
     return np.array([di1_dt, di2_dt, di3_dt, di4_dt, di5_dt, di6_dt, di7_dt, di8_dt])
 
 
+# FIVE BIT ADDRESSING MODEL SIMPLE
+def five_bit_simple_addressing_ode_model(Y, T, params):
+    alpha, delta, Kd, n = params
+    
+    q1, not_q1, q2, not_q2, q3, not_q3, q4, not_q4, q5, not_q5, i1, i2, i3, i4, i5, i6, i7, i8, i9, i10 = Y
+
+    di1_dt = alpha * activate_2(not_q1, not_q5, Kd, n) - delta * i1
+    di2_dt = alpha * activate_2(q1, not_q2, Kd, n) - delta * i2
+    di3_dt = alpha * activate_2(q2, not_q3, Kd, n) - delta * i3
+    di4_dt = alpha * activate_2(q3, not_q4, Kd, n) - delta * i4
+    di5_dt = alpha * activate_2(q4, not_q5, Kd, n) - delta * i5
+
+    di6_dt = alpha * activate_2(q1, q5, Kd, n) - delta * i6
+    
+    di7_dt = alpha * activate_2(not_q1, q2, Kd, n) - delta * i7
+    di8_dt = alpha * activate_2(not_q2, q3, Kd, n) - delta * i8
+    di9_dt = alpha * activate_2(not_q3, q4, Kd, n) - delta * i9
+    di10_dt = alpha * activate_2(not_q4, q5, Kd, n) - delta * i10
+
+    return np.array([di1_dt, di2_dt, di3_dt, di4_dt, di5_dt, di6_dt, di7_dt, di8_dt, di9_dt, di10_dt])
+
+
 
 """
 JOHSON COUNTER MODELS 
@@ -286,6 +308,35 @@ def four_bit_model(Y, T, params):
     dY4 = ff_ode_model(Y_FF4, T, params)
 
     dY = np.append(np.append(np.append(dY1, dY2), dY3), dY4)
+
+    return dY
+
+
+# TOP MODEL (JOHNSON): FIVE BIT MODEL WITH EXTERNAL CLOCK    
+def five_bit_model(Y, T, params):
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, a5, not_a5, q5, not_q5 = Y
+
+    clk = get_clock(T) 
+
+    d1 = not_q5
+    d2 = q1
+    d3 = q2
+    d4 = q3
+    d5 = q4
+
+    Y_FF1 = [a1, not_a1, q1, not_q1, d1, clk]
+    Y_FF2 = [a2, not_a2, q2, not_q2, d2, clk]
+    Y_FF3 = [a3, not_a3, q3, not_q3, d3, clk]
+    Y_FF4 = [a4, not_a4, q4, not_q4, d4, clk]
+    Y_FF5 = [a5, not_a5, q5, not_q5, d5, clk]
+
+    dY1 = ff_ode_model(Y_FF1, T, params)
+    dY2 = ff_ode_model(Y_FF2, T, params)
+    dY3 = ff_ode_model(Y_FF3, T, params)
+    dY4 = ff_ode_model(Y_FF4, T, params)
+    dY5 = ff_ode_model(Y_FF5, T, params)
+
+    dY = np.append(np.append(np.append(np.append(dY1, dY2), dY3), dY4), dY5)
 
     return dY
 
@@ -417,6 +468,22 @@ def four_bit_processor_ext(Y, T, params_johnson, params_addr):
 
     dY = np.append(dY_johnson, dY_addr)
     return dY
+
+
+# TOP MODEL OF PROCESSOR WITH FIVE BIT ADDRESSING
+def five_bit_processor_ext(Y, T, params_johnson, params_addr):
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, a5, not_a5, q5, not_q5, i1, i2, i3, i4, i5, i6, i7, i8 ,i9, i10 = Y
+
+    Y_johnson = [a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, a5, not_a5, q5, not_q5]
+    Y_address = [q1, not_q1, q2, not_q2, q3, not_q3, q4, not_q4, q5, not_q5, i1, i2, i3, i4, i5, i6, i7, i8, i9, i10]
+    
+    
+    dY_johnson = five_bit_model(Y_johnson, T, params_johnson)
+    dY_addr = four_bit_simple_addressing_ode_model(Y_address, T, params_addr)
+
+    dY = np.append(dY_johnson, dY_addr)
+    return dY
+
 
 
 
