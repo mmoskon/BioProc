@@ -20,7 +20,7 @@ Basic:
     Generate | Add | Sub | Jump | Nop
 ;
 If:
-    'IF' condition=ID commands+=Basic['^']
+    'IF' condition=ID commands+=Basic['^'] ('ELSE' commands_else+=Basic['^'])*
 ;
 While:
     'WHILE' condition=ID commands+=Basic['^']
@@ -166,7 +166,7 @@ def do_command(command,condition,operands, addr,inhibition,R,S, prog_params, pro
         instr = command.lower()
     else:
         instr = cname(command).lower()
-    if instr == "if" or instr == "do-while":
+    if instr == "if" or instr == "dowhile":
         if instr == "if":
             i_src = "i" + str(addr)
             i_dst = "i" + str(addr + 1)
