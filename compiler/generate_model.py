@@ -166,15 +166,33 @@ def do_command(command,condition,operands, addr,inhibition,R,S, prog_params, pro
         instr = command.lower()
     else:
         instr = cname(command).lower()
-    if instr == "if" or instr == "dowhile":
-        if instr == "if":
-            i_src = "i" + str(addr)
-            i_dst = "i" + str(addr + 1)
-            inhibition.append(True)
-        else:  # do-while
+    if instr == "if":
+        i_src = "i" + str(addr)
+        i_dst = "i" + str(addr + 1)
+        inhibition.append(True)
+        condition.append(command.condition)
+        r, s = from_i_to_RS(i_src, i_dst, n_bits=n_bits)
+        R.append(r)
+        S.append(s)
+        operands.add(command.condition)
+        for cmnd in command.commands:
+            do_command(cmnd, condition, operands, addr, inhibition, R, S, prog_params, prog, n_bits)
+        if command.commands_else:
             i_src = "i" + str(addr + 1)
-            i_dst = "i" + str(addr)
+            i_dst = "i" + str(addr + 2)
             inhibition.append(False)
+            r, s = from_i_to_RS(i_src, i_dst, n_bits=n_bits)
+            R.append(r)
+            S.append(s)
+            condition.append(command.condition)
+            for cmnd in command.commands_else:
+                do_command(cmnd, condition, operands, addr + 1, inhibition, R, S, prog_params, prog, n_bits)
+        return addr + 1
+
+    if instr == "dowhile": # do-while
+        i_src = "i" + str(addr + 1)
+        i_dst = "i" + str(addr)
+        inhibition.append(False)
 
         r, s = from_i_to_RS(i_src, i_dst, n_bits=n_bits)
         R.append(r)
@@ -184,7 +202,7 @@ def do_command(command,condition,operands, addr,inhibition,R,S, prog_params, pro
         operands.add(command.condition)
         for cmnd in command.commands:
             do_command(cmnd, condition, operands, addr, inhibition, R, S, prog_params, prog, n_bits)
-
+        return addr
     if instr == "while":
         # preverim, ce je izpolnjen pogoj, ce ni skocim naprej
         i_src = "i" + str(addr)
@@ -209,9 +227,9 @@ def do_command(command,condition,operands, addr,inhibition,R,S, prog_params, pro
         operands.add(command.condition)
         for cmnd in command.commands:
             do_command(cmnd, condition, operands, addr, inhibition, R, S, prog_params, prog,  n_bits)
-
+        return addr
     if instr == 'nop':
-        pass
+        return addr
     elif instr == 'generate':
         o = command.var
         operands.add(o)
@@ -223,7 +241,7 @@ def do_command(command,condition,operands, addr,inhibition,R,S, prog_params, pro
         prog_params |= {alpha, Kd, n}
 
         prog[o] += "+" + alpha + "*activate_1(i" + str(addr) + ",prog_Kd_" + o + ",prog_n_" + o + ")"
-
+        return addr
     elif instr == 'add' or instr == 'sub':
         o = command.v1
         operands.add(o)
@@ -244,6 +262,7 @@ def do_command(command,condition,operands, addr,inhibition,R,S, prog_params, pro
         else:
             prog[o] += "+" + alpha + "*hybrid_AAR(i" + str(
                 addr) + "," + op1 + ',' + op2 + ",prog_Kd_" + o + ",prog_n_" + o + ")"
+        return addr
     elif instr == "halt":
         i_src = "i" + str(addr + 1)
         i_dst = "i" + str(addr)
@@ -252,7 +271,7 @@ def do_command(command,condition,operands, addr,inhibition,R,S, prog_params, pro
         r, s = from_i_to_RS(i_src, i_dst, n_bits=n_bits)
         R.append(r)
         S.append(s)
-        return True
+        return None
 
     elif instr == "jump" or instr == "jumpif":
 
@@ -270,6 +289,7 @@ def do_command(command,condition,operands, addr,inhibition,R,S, prog_params, pro
         r, s = from_i_to_RS(i_src, i_dst, n_bits=n_bits)
         R.append(r)
         S.append(s)
+        return addr
 
 
 ####################################
@@ -301,9 +321,9 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
     for line in parsed_program.lines:
         do_not_continue = None
         for command in line.commands:
-            do_not_continue = do_command(command, condition,operands, addr,inhibition,R,S, prog_params, prog,  n_bits)
-            if do_not_continue:
-                # if do_command returns something it means it got a halt instruction so we should stop parsing commands
+            addr = do_command(command, condition,operands, addr,inhibition,R,S, prog_params, prog,  n_bits)
+            if not addr:
+                # if there is no current addres, we're halting!
                 break
         if do_not_continue:
             break
