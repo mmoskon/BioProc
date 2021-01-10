@@ -235,9 +235,21 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
             
             if instr == 'nop':
                 pass
-            elif instr == 'generate':
-                o = ops[0]
+            elif instr == 'generate1':
+                o = ops[0] + '0'
                 operands.add(o)
+                operands.add(ops[0] + '1')
+                
+                alpha = "prog_alpha_" + o 
+                Kd = "prog_Kd_" + o
+                n = "prog_n_" + o
+                prog_params |= {alpha, Kd, n}    
+                prog[o] += "+"+alpha+"*activate_1(i"+str(addr)+",prog_Kd_"+o+",prog_n_"+o+")"
+            
+            elif instr == 'generate2':
+                o = ops[0] + '1'
+                operands.add(o)
+                operands.add(ops[0] + '0')
 
                 alpha = "prog_alpha_" + o 
                 Kd = "prog_Kd_" + o
@@ -245,27 +257,66 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
                 
                 prog_params |= {alpha, Kd, n}
                 
-                prog[o] += "+"+alpha+"*activate_1(i"+str(addr)+",prog_Kd_"+o+",prog_n_"+o+")"
-        
-            elif instr == 'add' or instr == 'sub':
-                o = ops[0].strip()
+                prog[o] += "+"+alpha+"*activate_1(i"+str(addr)+",prog_Kd_"+o+",prog_n_"+o+") + 0.1"
+            elif instr == 'generate3':
+                o = ops[0] + '0'
                 operands.add(o)
-                op1 = ops[1].strip()
-                operands.add(op1)
-                op2 = ops[2].strip()
-                operands.add(op2)
+
+                alpha = "prog_alpha_" + o 
+                Kd = "prog_Kd_" + o
+                n = "prog_n_" + o
+                prog_params |= {alpha, Kd, n}
+                prog[o] += "+"+alpha+"*activate_1(i"+str(addr)+",prog_Kd_"+o+",prog_n_"+o+")"
+                # 1st bit -----
+                o = ops[0] + '1'
+                operands.add(o)
                 
                 alpha = "prog_alpha_" + o 
                 Kd = "prog_Kd_" + o
                 n = "prog_n_" + o
-                
                 prog_params |= {alpha, Kd, n}
+                prog[o] += "+"+alpha+"*activate_1(i"+str(addr)+",prog_Kd_"+o+",prog_n_"+o+") + 0.1"
+
+
+            elif instr == 'add' or instr == 'sub':
+                o = ops[0].strip()
+                operands.add(o + '0')
+                operands.add(o + '1')
+                op1 = ops[1].strip()
+                operands.add(op1 + '0')
+                operands.add(op1 + '1')
+                op2 = ops[2].strip()
+                operands.add(op2 + '0')
+                operands.add(op2 + '1')
+                
+                alpha = "prog_alpha_" + o + '0'
+                Kd = "prog_Kd_" + o + '0'
+                n = "prog_n_" + o + '0'
+                
+                alpha1 = "prog_alpha_" + o + '1' 
+                Kd1 = "prog_Kd_" + o + '1'
+                n1 = "prog_n_" + o + '1'
+
+                prog_params |= {alpha, Kd, n, alpha1, Kd1, n1}
                 if instr == 'add':
                     #prog[o] += alpha+"*activate_3(i"+str(addr)+","+op1+','+op2+",prog_Kd_"+o+",prog_n_"+o+")"
-                    prog[o] += "+"+alpha+"*activate_2(i"+str(addr)+","+op1+",prog_Kd_"+o+",prog_n_"+o+")"
-                    prog[o] += "+"+alpha+"*activate_2(i"+str(addr)+","+op2+",prog_Kd_"+o+",prog_n_"+o+")"
+                    # 0-th bit
+                    o = ops[0].strip() + '0'
+                    #prog[o] += "+"+alpha+"*activate_2(i"+str(addr)+","+op1+"0,prog_Kd_"+o+",prog_n_"+o+")"
+                    #prog[o] += "+"+alpha+"*activate_2(i"+str(addr)+","+op2+"0,prog_Kd_"+o+",prog_n_"+o+")"
+                    #prog[o] += "+"+alpha+"*activate_XOR_3(i"+str(addr)+","+op1+"0,"+op2+"0,prog_Kd_"+o+",prog_n_"+o+")"
+                    prog[o] += "+4*"+alpha+"*activate_OR_3(i"+str(addr)+","+op1+"0,"+op2+"0,prog_Kd_"+o+",prog_n_"+o+")"
+                    #prog[o] += "+"+alpha+"*activate_XOR_2(i"+str(addr)+","+op2+"0,prog_Kd_"+o+",prog_n_"+o+")"
+                    
+                    # 1-st bit
+                    o = ops[0].strip() + '1'
+                    prog[o] += "+"+alpha1+"*activate_2(i"+str(addr)+","+op1+"1,prog_Kd_"+o+",prog_n_"+o+")"
+                    prog[o] += "+"+alpha1+"*activate_2(i"+str(addr)+","+op2+"1,prog_Kd_"+o+",prog_n_"+o+")"
+                    
+                    print(addr, instr, '———>', prog[o])
                 else:
                     prog[o] += "+"+alpha+"*hybrid_AAR(i"+str(addr)+","+op1+','+op2+",prog_Kd_"+o+",prog_n_"+o+")"
+                    print(instr, '———>', prog[o])
             elif instr == "halt":
                 i_src = "i"+str(addr + 1)
                 i_dst = "i"+str(addr)
@@ -297,7 +348,6 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
             
             
         addr += 1
-        
     for o in operands: # dodam razgradnjo tudi za tiste, ki sicer nimajo enacbe
         prog[o] += "-prog_delta_"+o +"*"+o
         prog_params.add("prog_delta_" + o)

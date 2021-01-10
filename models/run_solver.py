@@ -28,8 +28,10 @@ if __name__ == "__main__":
         file_name = "02_bioproc"
     elif model_mode == three_bit_processor_ext:
         file_name = "03_bioproc"
-    else:
+    elif model_mode == three_bit_processor_ext:
         file_name = "04_bioproc"
+    else:
+        file_name = "05_bioproc"
 
     filename =  os.path.join(".", folder_name, file_name)                                             
     print(filename)        

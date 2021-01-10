@@ -30,6 +30,10 @@ if __name__ == '__main__':
     #base_paths_opt = [os.path.join(".", "results_opt"), os.path.join(".", "results_opt_rep1"), os.path.join(".", "results_opt_rep2")]
     num_models_fitness = 4
     num_models_regions = 4
+    
+    num_models_fitness = 5
+    num_models_regions = 5
+    
 
 
     base_path_robustness = os.path.join(".", "results_robustness") 
@@ -40,7 +44,7 @@ if __name__ == '__main__':
     #
 
 
-    models = [one_bit_processor_ext, two_bit_processor_ext, three_bit_processor_ext, four_bit_processor_ext]   
+    models = [one_bit_processor_ext, two_bit_processor_ext, three_bit_processor_ext, four_bit_processor_ext, five_bit_processor_ext]   
 
     #folders = [os.path.join(base_path, "one_bit_model"), os.path.join(base_path, "two_bit_model"), os.path.join(base_path, "three_bit_model")]   
     model_regions = []
@@ -50,7 +54,7 @@ if __name__ == '__main__':
         #folder = folders[model_index]               
         model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_index])                                       
         solver = Solver(model)    
-
+        print("A......")
         model_str = '0'+str(model_index+1)+'_'
         region_files =  []
         for base_path_opt in base_paths_opt:
@@ -60,7 +64,8 @@ if __name__ == '__main__':
                 for i in range(10):
                     region_files.append(os.path.join(base_path_opt, model_str+"bioproc_Region0ViableSet_Iter" + str(i+1) + ".p"))
 
-        viablePoints = []   
+        viablePoints = [] 
+        print(region_files)  
         for region_file in region_files: 
             viablePointsRegion = pickle.load(open(region_file, "rb"))   
             print(len(viablePointsRegion))   
@@ -555,7 +560,7 @@ def plotStochasticSimulations(from_file = True, number_points = 3, plotFlipflops
             samples = region.points[np.random.choice(region.points.shape[0], number_points, replace=False), :]    
         else:
             for i in range(number_points):
-                samples.append(pickle.load(open("selected_points\\model" + str(model_index + 1) + "sample" + str(i + 1) + ".p", "rb")))      
+                samples.append(pickle.load(open("selected_points/model" + str(model_index + 1) + "sample" + str(i + 1) + ".p", "rb")))      
             
         
         sample_num = 0
@@ -580,7 +585,7 @@ def plotStochasticSimulations(from_file = True, number_points = 3, plotFlipflops
                 axs[model_index,sample_num].plot(model.ts, Y_ode[:, -(2*(model_index + 1) - i)], color=c, linestyle="--")  
             
             if not from_file:
-                pickle.dump(sample, open("selected_points\\test_model" + str(model_index + 1) + "sample" + str(sample_num + 1) + ".p", "wb+")) 
+                pickle.dump(sample, open("selected_points/test_model" + str(model_index + 1) + "sample" + str(sample_num + 1) + ".p", "wb+")) 
             
             sample_num += 1 
             
@@ -600,20 +605,27 @@ def plotStochasticSimulations(from_file = True, number_points = 3, plotFlipflops
     plt.gcf().set_size_inches(15,12) 
     plt.savefig(os.path.join(base_path_robustness, 'ssa.pdf'), bbox_inches = 'tight')
     if pickle_dump:
-        pickle.dump(fig, open("selected_points\\plot_SSA.pickle", "wb"))
+        pickle.dump(fig, open("selected_points/plot_SSA.pickle", "wb"))
 
     plt.show()  
 
     
 
 if __name__ == "__main__":
- 
-    ##df = getCostsParallel(file_name="results_robustness\\costs.csv")  
-    #df = pd.read_csv("results_robustness\\costs.csv")
-    #plotCostdf(df)
+    print('------------------------------------------------------------- ok 0')
+    df = getCostsParallel(file_name="results_robustness/costs.csv")  
+    print('------------------------------------------------------------- ok 1')
+    df = pd.read_csv("results_robustness/costs.csv")
+    print('------------------------------------------------------------- ok 2')
+    plotCostdf(df)
+    print('------------------------------------------------------------- ok 3')
 
-    ##df = getParamDistrib(file_name="results_robustness\\params.csv")
-    #df = pd.read_csv("results_robustness\\params.csv")
-    #plotParamsdf(df)
-    
+
+    df = getParamDistrib(file_name="results_robustness/params.csv")
+    print('------------------------------------------------------------- ok 4')
+    df = pd.read_csv("results_robustness/params.csv")
+    print('------------------------------------------------------------- ok 5')
+
+    plotParamsdf(df)
+    print('------------------------------------------------------------- ok 6')
     plotStochasticSimulations(pickle_dump=False)   

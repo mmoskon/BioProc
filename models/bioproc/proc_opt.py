@@ -54,6 +54,12 @@ class BioProc:
                 self.y0 = np.loadtxt('init4bit.txt')
             else:                
                 self.y0 = [0]*(self.multiplier*6) 
+        elif self.model_mode == five_bit_processor_ext:
+            self.multiplier = 5         
+            if load_init:
+                self.y0 = np.loadtxt('init4bit.txt')
+            else:                
+                self.y0 = [0]*(self.multiplier*6) 
         else: 
             sys.exit('Error: unvalid model mode')       
             

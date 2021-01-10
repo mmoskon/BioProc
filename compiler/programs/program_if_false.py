@@ -1,25 +1,36 @@
 from bioproc.hill_functions import *
 def model(Y, T, params):
-	a0, not_a0, q0, not_q0,a1, not_a1, q1, not_q1,a2, not_a2, q2, not_q2,a3, not_a3, q3, not_q3,a4, not_a4, q4, not_q4,i1, i2, i3, i4, i5, i6, i7, i8, i9, i10,A,B,C,=Y
+	a0, not_a0, q0, not_q0,a1, not_a1, q1, not_q1,a2, not_a2, q2, not_q2,a3, not_a3, q3, not_q3,a4, not_a4, q4, not_q4,i1, i2, i3, i4, i5, i6, i7, i8, i9, i10,A0,A1,B0,B1,D0,D1,=Y
 	alpha1, alpha2, alpha3, alpha4, delta1, delta2, Kd, n, deltaE, KM,alpha_a, delta_a, Kd_a, n_a,KD_cond,=params
 	clk = get_clock(T)
-	prog_alpha_C=10
-	prog_n_C=2
-	prog_delta_B=0.1
-	prog_Kd_A=10
-	prog_alpha_A=10
-	prog_Kd_C=10
-	prog_delta_A=0.1
-	prog_delta_C=0.1
-	prog_n_A=2
-	dA_dt=+prog_alpha_A*activate_1(i1,prog_Kd_A,prog_n_A)-prog_delta_A*A
-	dC_dt=+prog_alpha_C*activate_2(i2,A,prog_Kd_C,prog_n_C)+prog_alpha_C*activate_2(i2,B,prog_Kd_C,prog_n_C)+prog_alpha_C*activate_1(i10,prog_Kd_C,prog_n_C)-prog_delta_C*C
-	dB_dt=-prog_delta_B*B
-	cond0=A
+	prog_n_A0=2
+	prog_n_D1=2
+	prog_Kd_A0=10
+	prog_Kd_D1=10
+	prog_delta_D1=0.1
+	prog_alpha_A0=10
+	prog_alpha_D1=10
+	prog_alpha_B0=10
+	prog_n_D0=2
+	prog_Kd_D0=10
+	prog_delta_B0=0.1
+	prog_delta_B1=0.1
+	prog_delta_A0=0.1
+	prog_delta_A1=0.1
+	prog_n_B0=2
+	prog_delta_D0=0.1
+	prog_Kd_B0=10
+	prog_alpha_D0=10
+	dA0_dt=+prog_alpha_A0*activate_1(i1,prog_Kd_A0,prog_n_A0)-prog_delta_A0*A0
+	dB0_dt=+prog_alpha_B0*activate_1(i2,prog_Kd_B0,prog_n_B0)-prog_delta_B0*B0
+	dD0_dt=+4*prog_alpha_D0*activate_OR_3(i3,A0,B0,prog_Kd_D0,prog_n_D0)-prog_delta_D0*D0
+	dD1_dt=+prog_alpha_D1*activate_2(i3,A1,prog_Kd_D1,prog_n_D1)+prog_alpha_D1*activate_2(i3,B1,prog_Kd_D1,prog_n_D1)-prog_delta_D1*D1
+	dB1_dt=-prog_delta_B1*B1
+	dA1_dt=-prog_delta_A1*A1
 	RESET0=0 if T > 1 else 100
 	SET0=0 
 	RESET1=0 if T > 1 else 100
-	SET1=max((inhibition(i2, cond0, KD_cond),)) 
+	SET1=0 
 	RESET2=0 if T > 1 else 100
 	SET2=0 
 	RESET3=0 if T > 1 else 100
@@ -71,4 +82,4 @@ def model(Y, T, params):
 	di8_dt = alpha_a * activate_2(not_q1, q2, Kd_a, n_a) - delta_a * i8
 	di9_dt = alpha_a * activate_2(not_q2, q3, Kd_a, n_a) - delta_a * i9
 	di10_dt = alpha_a * activate_2(not_q3, q4, Kd_a, n_a) - delta_a * i10
-	return [da0_dt,dnot_a0_dt,dq0_dt,dnot_q0_dt,da1_dt,dnot_a1_dt,dq1_dt,dnot_q1_dt,da2_dt,dnot_a2_dt,dq2_dt,dnot_q2_dt,da3_dt,dnot_a3_dt,dq3_dt,dnot_q3_dt,da4_dt,dnot_a4_dt,dq4_dt,dnot_q4_dt,di1_dt,di2_dt,di3_dt,di4_dt,di5_dt,di6_dt,di7_dt,di8_dt,di9_dt,di10_dt,dA_dt,dB_dt,dC_dt]
+	return [da0_dt,dnot_a0_dt,dq0_dt,dnot_q0_dt,da1_dt,dnot_a1_dt,dq1_dt,dnot_q1_dt,da2_dt,dnot_a2_dt,dq2_dt,dnot_q2_dt,da3_dt,dnot_a3_dt,dq3_dt,dnot_q3_dt,da4_dt,dnot_a4_dt,dq4_dt,dnot_q4_dt,di1_dt,di2_dt,di3_dt,di4_dt,di5_dt,di6_dt,di7_dt,di8_dt,di9_dt,di10_dt,dA0_dt,dA1_dt,dB0_dt,dB1_dt,dD0_dt,dD1_dt]

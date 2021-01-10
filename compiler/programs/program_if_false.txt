@@ -1,5 +1,6 @@
-generate A
-if A add C, A, B
+generate1 A
+generate1 B
+add D, A, B
 nop
 nop
 nop

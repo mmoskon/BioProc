@@ -479,7 +479,7 @@ def five_bit_processor_ext(Y, T, params_johnson, params_addr):
     
     
     dY_johnson = five_bit_model(Y_johnson, T, params_johnson)
-    dY_addr = four_bit_simple_addressing_ode_model(Y_address, T, params_addr)
+    dY_addr = five_bit_simple_addressing_ode_model(Y_address, T, params_addr)
 
     dY = np.append(dY_johnson, dY_addr)
     return dY

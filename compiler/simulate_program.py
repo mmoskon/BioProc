@@ -123,8 +123,8 @@ def simulate_program(program_name, t_end, N, params_ff, params_addr, params_prot
           bbox_transform=plt.gcf().transFigure)
 
     if ax == plt:
-        plt.savefig("figs\\"+program_name.split(".")[0]+".pdf", bbox_inches = 'tight')
-        plt.savefig("figs\\"+program_name.split(".")[0]+".png")
+        plt.savefig("figs/"+program_name.split(".")[0]+".pdf", bbox_inches = 'tight')
+        plt.savefig("figs/"+program_name.split(".")[0]+".png")
         
         plt.xlabel('Time [h]')
         plt.ylabel('Concentrations [nM]')
@@ -175,7 +175,7 @@ if __name__ == '__main__':
     #program_name, t_end, prog_delta = "programs\\Figure_if_false.txt", 120, 0.1
     #program_name, t_end = "programs/Figure_while.txt", 180
 
-    plot_multi = True
+    plot_multi = False #True
 
     params_prog  = prog_alpha, prog_delta, prog_n, prog_Kd
 
