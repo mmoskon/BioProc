@@ -115,6 +115,19 @@ def hybrid_2(A1, A2, A3, Kd1, n1, Kd2=0, n2=0):
     #return activate_1(A1,Kd1, n1) * activate_1(A2,Kd2, n2) *  activate_1(A3,Kd2, n2) * repress_1(A2, Kd1, n1) * repress_1(A3, Kd1, n1) * repress_1(A3, Kd2, n2) * repress_1(A3, Kd2, n2)
 
 
+def zeroth_bit(A, B, C, Kd_A, n_A, Kd_R=0, n_R=0):
+    if not Kd_R:
+        Kd_R = Kd_A
+    if not n_R:
+        n_R = n_A
+    return (activate_1(A, Kd_A, n_A) * activate_1(B, Kd_A, n_A) * repress_1(C, Kd_R, n_R)) + (activate_1(A, Kd_A, n_A) * activate_1(C, Kd_A, n_A) * repress_1(B, Kd_R, n_R))
+
+def first_bit(C1, A0, A1, B0, B1, Kd_A, n_A):
+    out = (activate_1(C1, Kd_A, n_A) * (activate_1(A0, Kd_A, n_A) * activate_1(B0, Kd_A, n_A)))
+    out += (activate_1(C1, Kd_A, n_A) * activate_1(A1, Kd_A, n_A))
+    out += (activate_1(C1, Kd_A, n_A) * activate_1(B1, Kd_A, n_A))
+    return out
+
 
 #def activate_XOR_3(A1, A2, A3, Kd1, n1, Kd2=0, n2=0):
 #    return activate_1(A1, Kd1, n1) * (pow(A2/Kd1, n1) + pow(A3/Kd2, n2))/(1 + pow(A2/Kd1, n1) + pow(A3/Kd2, n2) + pow(A2/Kd1, n1) * pow(A3/Kd2, n2))

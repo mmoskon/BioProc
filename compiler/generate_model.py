@@ -257,7 +257,7 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
                 
                 prog_params |= {alpha, Kd, n}
                 
-                prog[o] += "+"+alpha+"*activate_1(i"+str(addr)+",prog_Kd_"+o+",prog_n_"+o+") + 0.1"
+                prog[o] += "+"+alpha+"*activate_1(i"+str(addr)+",prog_Kd_"+o+",prog_n_"+o+") + 1"
             elif instr == 'generate3':
                 o = ops[0] + '0'
                 operands.add(o)
@@ -275,7 +275,7 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
                 Kd = "prog_Kd_" + o
                 n = "prog_n_" + o
                 prog_params |= {alpha, Kd, n}
-                prog[o] += "+"+alpha+"*activate_1(i"+str(addr)+",prog_Kd_"+o+",prog_n_"+o+") + 0.1"
+                prog[o] += "+"+alpha+"*activate_1(i"+str(addr)+",prog_Kd_"+o+",prog_n_"+o+") + 1"
 
 
             elif instr == 'add' or instr == 'sub':
@@ -305,13 +305,14 @@ def generate_model(program_name, output_name, n_bits, prog_alpha, prog_delta, pr
                     #prog[o] += "+"+alpha+"*activate_2(i"+str(addr)+","+op1+"0,prog_Kd_"+o+",prog_n_"+o+")"
                     #prog[o] += "+"+alpha+"*activate_2(i"+str(addr)+","+op2+"0,prog_Kd_"+o+",prog_n_"+o+")"
                     #prog[o] += "+"+alpha+"*activate_XOR_3(i"+str(addr)+","+op1+"0,"+op2+"0,prog_Kd_"+o+",prog_n_"+o+")"
-                    prog[o] += "+4*"+alpha+"*activate_OR_3(i"+str(addr)+","+op1+"0,"+op2+"0,prog_Kd_"+o+",prog_n_"+o+")"
+                    prog[o] += "+"+alpha+"*zeroth_bit(i"+str(addr)+","+op1+"0,"+op2+"0,prog_Kd_"+o+",prog_n_"+o+")"
                     #prog[o] += "+"+alpha+"*activate_XOR_2(i"+str(addr)+","+op2+"0,prog_Kd_"+o+",prog_n_"+o+")"
                     
                     # 1-st bit
                     o = ops[0].strip() + '1'
-                    prog[o] += "+"+alpha1+"*activate_2(i"+str(addr)+","+op1+"1,prog_Kd_"+o+",prog_n_"+o+")"
-                    prog[o] += "+"+alpha1+"*activate_2(i"+str(addr)+","+op2+"1,prog_Kd_"+o+",prog_n_"+o+")"
+                    #prog[o] += "+"+alpha1+"*activate_2(i"+str(addr)+","+op1+"1,prog_Kd_"+o+",prog_n_"+o+")"
+                    #prog[o] += "+"+alpha1+"*activate_2(i"+str(addr)+","+op2+"1,prog_Kd_"+o+",prog_n_"+o+")"
+                    prog[o] += "+"+alpha1+"*first_bit(i"+str(addr)+","+op1+'0,'+op1+"1,"+op2+'0,'+op2+"1,prog_Kd_"+o+",prog_n_"+o+") + 1"
                     
                     print(addr, instr, '———>', prog[o])
                 else:

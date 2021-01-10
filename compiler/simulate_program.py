@@ -145,7 +145,7 @@ if __name__ == '__main__':
 
     plot_ops = True
 
-    prog_alpha = 10
+    prog_alpha = 1000
     prog_delta = 0.1#0.01
     prog_n = 2
     prog_Kd = 10

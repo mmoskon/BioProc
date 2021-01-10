@@ -1,6 +1,5 @@
-generate1 A
-generate1 B
-add D, A, B
+generate3 A
+add C, A, B
 nop
 nop
 nop
