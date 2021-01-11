@@ -108,7 +108,7 @@ def simulate_program(program_name, t_end, N, params_ff, params_addr, params_prot
     
     if plot_clock:
         clk = get_clock(T)
-        ax.plot(T,clk, color="black", alpha=0.1)
+        ax.plot(T,90*clk, color="black", alpha=0.1)
         ax.legend(ops + ['clk'], loc='upper left')
         legend += ['clk']
     

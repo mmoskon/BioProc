@@ -53,8 +53,8 @@ if __name__ == '__main__':
     for model_index in range(num_models_regions):                    
         #folder = folders[model_index]               
         model = BioProc(np.array(["protein_production", "protein_production", "protein_production", "protein_production", "protein_degradation", "protein_degradation", "Kd","hill", "protein_production", "protein_degradation", "Kd", "hill"]), model_mode=models[model_index])                                       
+        
         solver = Solver(model)    
-        print("A......")
         model_str = '0'+str(model_index+1)+'_'
         region_files =  []
         for base_path_opt in base_paths_opt:
