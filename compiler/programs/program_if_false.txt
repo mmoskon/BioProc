@@ -7,4 +7,3 @@ nop
 nop
 nop
 nop
-generate C

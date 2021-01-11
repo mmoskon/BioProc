@@ -1,0 +1,31 @@
+C = A + B
+
+C0 = A0 xor B0 = (A0 and !B0) or (!A0 and B0)
+
+C1 = A1 or B1 or (A0 and B0)
+
+-------------------------------------------
+C = A - B
+
+C0 = (!A1 and A0 and !B1 and B0) or (A1 and A0 and B1 and B0) or (A1 and !A0 and !B1 and B0) or (A1 and A0 and B1 and !B0)
+C0 = (!A1 and A0 and B0 and !B1) or (!A1 and A0 and !B1 and B0) or (A1 and A0 and B1)
+wolfram: (!A and a and !B and b) or (A and a and B and b) or (A and !a and !B and b) or (A and a and B and !b)
+
+C1 = (A1 and !A0 and !B1 and !B0) or (A1 and A0 and !B1 and B0) or (A1 and A0 and B1 and !B0)
+C1 = A1 and A0 and !(B1 and B0)
+wolfram: (A and a and !B and !b) or (A and a and !B and b) or (A and a and B and !b)
+
+00 - 00 = 00
+01 - 00 = 01
+10 - 00 = 10
+11 - 00 = 11
+----
+01 - 01 = 00
+10 - 01 = 01
+11 - 01 = 10
+----
+10 - 10 = 00
+11 - 10 = 01
+----
+11 - 11 = 00 
+
