@@ -1,3 +1,0 @@
-generate A; generate B; add E, A, B
-add C, A, B; sub D, A, B
-halt

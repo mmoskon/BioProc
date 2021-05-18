@@ -1,2 +1,0 @@
-generate A
-if B add C, A, B

@@ -1,4 +1,0 @@
-generate A
-generate B
-sub C, A, B
-halt

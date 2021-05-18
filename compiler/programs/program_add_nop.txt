@@ -1,3 +1,0 @@
-generate A
-nop
-add C, A, B
