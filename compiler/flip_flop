@@ -1,0 +1,8 @@
+a$, not_a$, q$, not_q$,
+alpha1, alpha2, alpha3, alpha4, delta1, delta2, Kd, n, deltaE, KM,
+	sum_one = a$ + q$
+	sum_zero = not_a$ + not_q$
+	da$_dt     = alpha1*(pow(d$/Kd, n)/(1 + pow(d$/Kd, n) + pow(clk/Kd, n) + pow(d$/Kd, n)*pow(clk/Kd, n))) + alpha2*(1/(1 + pow(not_a$/Kd, n))) - delta1 *a$ -a$*(deltaE*RESET$/(KM+sum_one))
+	dnot_a$_dt = alpha1*(1/(1 + pow(d$/Kd, n) + pow(clk/Kd, n) + pow(d$/Kd, n)*pow(clk/Kd, n))) + alpha2*(1/(1 + pow(a$/Kd, n))) - delta1*not_a$-not_a$*(deltaE*SET$/(KM+sum_zero))
+	dq$_dt     = alpha3*((pow(a$/Kd, n)*pow(clk/Kd, n))/(1 + pow(a$/Kd, n) + pow(clk/Kd, n) + pow(a$/Kd, n)*pow(clk/Kd, n))) + alpha4*(1/(1 + pow(not_q$/Kd, n))) - delta2*q$-q$*(deltaE*RESET$/(KM+sum_one))
+	dnot_q$_dt = alpha3*((pow(not_a$/Kd, n)*pow(clk/Kd, n))/(1 + pow(not_a$/Kd, n) + pow(clk/Kd, n) + pow(not_a$/Kd, n)*pow(clk/Kd, n))) + alpha4*(1/(1 + pow(q$/Kd, n))) - delta2*not_q$ -not_q$*(deltaE*SET$/(KM+sum_zero))

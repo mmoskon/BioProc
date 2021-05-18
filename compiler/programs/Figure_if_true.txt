@@ -1,0 +1,4 @@
+nop
+nop
+generate condition
+if condition nop

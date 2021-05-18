@@ -1,0 +1,10 @@
+i1, i2, i3, i4, i5, i6, i7, i8,
+alpha_a, delta_a, Kd_a, n_a,
+	di1_dt = alpha_a * activate_2(not_q0, not_q3, Kd_a, n_a) - delta_a * i1
+	di2_dt = alpha_a * activate_2(q0, not_q1, Kd_a, n_a) - delta_a * i2
+	di3_dt = alpha_a * activate_2(q1, not_q2, Kd_a, n_a) - delta_a * i3
+	di4_dt = alpha_a * activate_2(q2, not_q3, Kd_a, n_a) - delta_a * i4
+	di5_dt = alpha_a * activate_2(q0, q3, Kd_a, n_a) - delta_a * i5
+	di6_dt = alpha_a * activate_2(not_q0, q1, Kd_a, n_a) - delta_a * i6
+	di7_dt = alpha_a * activate_2(not_q1, q2, Kd_a, n_a) - delta_a * i7
+	di8_dt = alpha_a * activate_2(not_q2, q3, Kd_a, n_a) - delta_a * i8

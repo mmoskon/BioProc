@@ -1,0 +1,7 @@
+generate A
+generate B
+if B add C, A, B
+op
+op
+if A generate C
+if B generate D

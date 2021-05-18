@@ -1,0 +1,3 @@
+generate A
+generate B
+if B add C, A, B
