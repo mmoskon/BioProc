@@ -1,6 +1,6 @@
 import numpy as np
-import simplesbml
- 
+import simplesbml #https://simplesbml.readthedocs.io/en/latest/
+import os
  
 """
 FLIP-FLOP MODELS
@@ -214,51 +214,126 @@ def one_bit_simple_addressing_ode_model(Y, params):
 
    
 # TWO BIT ADDRESSING MODEL SIMPLE
-def two_bit_simple_addressing_ode_model(Y, T, params):
-    alpha, delta, Kd, n = params
+def two_bit_simple_addressing_ode_model(Y, params):
+    #alpha, delta, Kd, n = params
+    #q1, not_q1, q2, not_q2, i1, i2, i3, i4 = Y
     
-    q1, not_q1, q2, not_q2, i1, i2, i3, i4 = Y
+    d = {"$q1$"     : Y[0], 
+         "$not_q1$" : Y[1], 
+         "$q2$"     : Y[2], 
+         "$not_q2$" : Y[3], 
+         "$i1$"     : Y[4], 
+         "$i2$"     : Y[5],
+         "$i3$"     : Y[6],
+         "$i4$"     : Y[7],         
+         "$alpha$"  : params[0], 
+         "$delta$"  : params[1], 
+         "$Kd$"     : params[2], 
+         "$n$"      : params[3]
+        }
 
-    di1_dt = alpha * activate_2(not_q1, not_q2, Kd, n) - delta * i1
-    di2_dt = alpha * activate_2(q1, not_q2, Kd, n) - delta * i2
-    di3_dt = alpha * activate_2(q1, q2, Kd, n) - delta * i3
-    di4_dt = alpha * activate_2(not_q1, q2, Kd, n) - delta * i4
+    di1_dt = "$alpha$ * " + activate_2("$not_q1$", "$not_q2$", "$Kd$", "$n$") + " - $delta$ * $i1$"
+    di2_dt = "$alpha$ * " + activate_2("$q1$", "$not_q2$", "$Kd$", "$n$") + "- $delta$ * $i2$"
+    di3_dt = "$alpha$ * " + activate_2("$q1$", "$q2$", "$Kd$", "$n$") + "- $delta$ * $i3$"
+    di4_dt = "$alpha$ * " + activate_2("$not_q1$", "$q2$", "$Kd$", "$n$") + "- $delta$ * $i4$"
 
-    return np.array([di1_dt, di2_dt, di3_dt, di4_dt])
+    for old_s, new_s in d.items():
+        di1_dt = di1_dt.replace(old_s, new_s)
+        di2_dt = di2_dt.replace(old_s, new_s)
+        di3_dt = di3_dt.replace(old_s, new_s)
+        di4_dt = di4_dt.replace(old_s, new_s)
+        
+    return [di1_dt, di2_dt, di3_dt, di4_dt]
 
 # THREE BIT ADDRESSING MODEL SIMPLE
-def three_bit_simple_addressing_ode_model(Y, T, params):
-    alpha, delta, Kd, n = params
-    
-    q1, not_q1, q2, not_q2, q3, not_q3, i1, i2, i3, i4, i5, i6 = Y
+def three_bit_simple_addressing_ode_model(Y, params):
+    #alpha, delta, Kd, n = params    
+    #q1, not_q1, q2, not_q2, q3, not_q3, i1, i2, i3, i4, i5, i6 = Y
 
-    di1_dt = alpha * activate_2(not_q1, not_q3, Kd, n) - delta * i1
-    di2_dt = alpha * activate_2(q1, not_q2, Kd, n) - delta * i2
-    di3_dt = alpha * activate_2(q2, not_q3, Kd, n) - delta * i3
-    di4_dt = alpha * activate_2(q1, q3, Kd, n) - delta * i4
-    di5_dt = alpha * activate_2(not_q1, q2, Kd, n) - delta * i5
-    di6_dt = alpha * activate_2(not_q2, q3, Kd, n) - delta * i6
+    d = {"$q1$"     : Y[0], 
+         "$not_q1$" : Y[1], 
+         "$q2$"     : Y[2], 
+         "$not_q2$" : Y[3], 
+         "$q3$"     : Y[4], 
+         "$not_q3$" : Y[5], 
+         "$i1$"     : Y[6], 
+         "$i2$"     : Y[7],
+         "$i3$"     : Y[8],
+         "$i4$"     : Y[9],
+         "$i5$"     : Y[10],
+         "$i6$"     : Y[11],         
+         "$alpha$"  : params[0], 
+         "$delta$"  : params[1], 
+         "$Kd$"     : params[2], 
+         "$n$"      : params[3]
+        }
 
-    return np.array([di1_dt, di2_dt, di3_dt, di4_dt, di5_dt, di6_dt])
+
+    di1_dt = "$alpha$ * " + activate_2("$not_q1$", "$not_q3$", "$Kd$", "$n$") + "- $delta$ * $i1$"
+    di2_dt = "$alpha$ * " + activate_2("$q1$", "$not_q2$", "$Kd$", "$n$") + "- $delta$ * $i2$"
+    di3_dt = "$alpha$ * " + activate_2("$q2$", "$not_q3$", "$Kd$", "$n$") + "- $delta$ * $i3$"
+    di4_dt = "$alpha$ * " + activate_2("$q1$", "$q3$", "$Kd$", "$n$") + "- $delta$ * $i4$"
+    di5_dt = "$alpha$ * " + activate_2("$not_q1$", "$q2$", "$Kd$", "$n$") + "- $delta$ * $i5$"
+    di6_dt = "$alpha$ * " + activate_2("$not_q2$", "$q3$", "$Kd$", "$n$") + "- $delta$ * $i6$"
+
+    for old_s, new_s in d.items():
+        di1_dt = di1_dt.replace(old_s, new_s)
+        di2_dt = di2_dt.replace(old_s, new_s)
+        di3_dt = di3_dt.replace(old_s, new_s)
+        di4_dt = di4_dt.replace(old_s, new_s)
+        di5_dt = di5_dt.replace(old_s, new_s)
+        di6_dt = di6_dt.replace(old_s, new_s)        
+
+    return [di1_dt, di2_dt, di3_dt, di4_dt, di5_dt, di6_dt]
 
 # FOUR BIT ADDRESSING MODEL SIMPLE
-def four_bit_simple_addressing_ode_model(Y, T, params):
-    alpha, delta, Kd, n = params
+def four_bit_simple_addressing_ode_model(Y, params):
+    #alpha, delta, Kd, n = params    
+    #q1, not_q1, q2, not_q2, q3, not_q3, q4, not_q4, i1, i2, i3, i4, i5, i6, i7, i8 = Y
+
+    d = {"$q1$"     : Y[0], 
+         "$not_q1$" : Y[1], 
+         "$q2$"     : Y[2], 
+         "$not_q2$" : Y[3], 
+         "$q3$"     : Y[4], 
+         "$not_q3$" : Y[5], 
+         "$q4$"     : Y[6], 
+         "$not_q4$" : Y[7], 
+         "$i1$"     : Y[8], 
+         "$i2$"     : Y[9],
+         "$i3$"     : Y[10],
+         "$i4$"     : Y[11],
+         "$i5$"     : Y[12],
+         "$i6$"     : Y[13],
+         "$i7$"     : Y[14],
+         "$i8$"     : Y[15],
+         "$alpha$"  : params[0], 
+         "$delta$"  : params[1], 
+         "$Kd$"     : params[2], 
+         "$n$"      : params[3]
+        }
+
+    di1_dt = "$alpha$ * " + activate_2("$not_q1$", "$not_q4$", "$Kd$", "$n$") + "- $delta$ * $i1$"
+    di2_dt = "$alpha$ * " + activate_2("$q1$", "$not_q2$", "$Kd$", "$n$") + " - $delta$ * $i2$"
+    di3_dt = "$alpha$ * " + activate_2("$q2$", "$not_q3$", "$Kd$", "$n$") + "- $delta$ * $i3$"
+    di4_dt = "$alpha$ * " + activate_2("$q3$", "$not_q4$", "$Kd$", "$n$") + "- $delta$ * $i4$"
     
-    q1, not_q1, q2, not_q2, q3, not_q3, q4, not_q4, i1, i2, i3, i4, i5, i6, i7, i8 = Y
+    di5_dt = "$alpha$ * " + activate_2("$q1$", "$q4$", "$Kd$", "$n$") + "- $delta$ * $i5$"
+    di6_dt = "$alpha$ * " + activate_2("$not_q1$", "$q2$", "$Kd$", "$n$") + "- $delta$ * $i6$"
+    di7_dt = "$alpha$ * " + activate_2("$not_q2$", "$q3$", "$Kd$", "$n$") + "- $delta$ * $i7$"
+    di8_dt = "$alpha$ * " + activate_2("$not_q3$", "$q4$", "$Kd$", "$n$") + "- $delta$ * $i8$"
 
-    di1_dt = alpha * activate_2(not_q1, not_q4, Kd, n) - delta * i1
-    di2_dt = alpha * activate_2(q1, not_q2, Kd, n) - delta * i2
-    di3_dt = alpha * activate_2(q2, not_q3, Kd, n) - delta * i3
-    di4_dt = alpha * activate_2(q3, not_q4, Kd, n) - delta * i4
-    
-    di5_dt = alpha * activate_2(q1, q4, Kd, n) - delta * i5
-    di6_dt = alpha * activate_2(not_q1, q2, Kd, n) - delta * i6
-    di7_dt = alpha * activate_2(not_q2, q3, Kd, n) - delta * i7
-    di8_dt = alpha * activate_2(not_q3, q4, Kd, n) - delta * i8
+    for old_s, new_s in d.items():
+        di1_dt = di1_dt.replace(old_s, new_s)
+        di2_dt = di2_dt.replace(old_s, new_s)
+        di3_dt = di3_dt.replace(old_s, new_s)
+        di4_dt = di4_dt.replace(old_s, new_s)
+        di5_dt = di5_dt.replace(old_s, new_s)
+        di6_dt = di6_dt.replace(old_s, new_s)
+        di7_dt = di7_dt.replace(old_s, new_s)
+        di8_dt = di8_dt.replace(old_s, new_s)
 
-
-    return np.array([di1_dt, di2_dt, di3_dt, di4_dt, di5_dt, di6_dt, di7_dt, di8_dt])
+    return [di1_dt, di2_dt, di3_dt, di4_dt, di5_dt, di6_dt, di7_dt, di8_dt]
 
 
 
@@ -280,10 +355,10 @@ def one_bit_model(Y, params):
     return dY
 
 # TOP MODEL (JOHNSON): TWO BIT MODEL WITH EXTERNAL CLOCK    
-def two_bit_model(Y, T, params): 
-    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2 = Y
+def two_bit_model(Y, params): 
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, clk = Y
 
-    clk = get_clock(T) 
+    #clk = get_clock(T) 
 
     d1 = not_q2
     d2 = q1
@@ -291,18 +366,18 @@ def two_bit_model(Y, T, params):
     Y_FF1 = [a1, not_a1, q1, not_q1, d1, clk]
     Y_FF2 = [a2, not_a2, q2, not_q2, d2, clk]
 
-    dY1 = ff_ode_model(Y_FF1, T, params)
-    dY2 = ff_ode_model(Y_FF2, T, params)
+    dY1 = ff_ode_model(Y_FF1, params)
+    dY2 = ff_ode_model(Y_FF2, params)
 
-    dY = np.append(dY1, dY2)
+    dY = dY1 + dY2
 
     return dY
 
 # TOP MODEL (JOHNSON): THREE BIT MODEL WITH EXTERNAL CLOCK    
-def three_bit_model(Y, T, params):
-    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3 = Y
+def three_bit_model(Y, params):
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, clk = Y
 
-    clk = get_clock(T) 
+    #clk = get_clock(T) 
 
     d1 = not_q3
     d2 = q1
@@ -312,19 +387,19 @@ def three_bit_model(Y, T, params):
     Y_FF2 = [a2, not_a2, q2, not_q2, d2, clk]
     Y_FF3 = [a3, not_a3, q3, not_q3, d3, clk]
 
-    dY1 = ff_ode_model(Y_FF1, T, params)
-    dY2 = ff_ode_model(Y_FF2, T, params)
-    dY3 = ff_ode_model(Y_FF3, T, params)
+    dY1 = ff_ode_model(Y_FF1, params)
+    dY2 = ff_ode_model(Y_FF2, params)
+    dY3 = ff_ode_model(Y_FF3, params)
 
-    dY = np.append(np.append(dY1, dY2), dY3)
+    dY = dY1 + dY2 + dY3
 
     return dY
 
 # TOP MODEL (JOHNSON): FOUR BIT MODEL WITH EXTERNAL CLOCK    
-def four_bit_model(Y, T, params):
-    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4 = Y
+def four_bit_model(Y, params):
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, clk = Y
 
-    clk = get_clock(T) 
+    #clk = get_clock(T) 
 
     d1 = not_q4
     d2 = q1
@@ -336,12 +411,12 @@ def four_bit_model(Y, T, params):
     Y_FF3 = [a3, not_a3, q3, not_q3, d3, clk]
     Y_FF4 = [a4, not_a4, q4, not_q4, d4, clk]
 
-    dY1 = ff_ode_model(Y_FF1, T, params)
-    dY2 = ff_ode_model(Y_FF2, T, params)
-    dY3 = ff_ode_model(Y_FF3, T, params)
-    dY4 = ff_ode_model(Y_FF4, T, params)
+    dY1 = ff_ode_model(Y_FF1, params)
+    dY2 = ff_ode_model(Y_FF2, params)
+    dY3 = ff_ode_model(Y_FF3, params)
+    dY4 = ff_ode_model(Y_FF4, params)
 
-    dY = np.append(np.append(np.append(dY1, dY2), dY3), dY4)
+    dY = dY1 + dY2 + dY3 + dY4
 
     return dY
 
@@ -425,45 +500,45 @@ def one_bit_processor_ext(Y, params_johnson, params_addr):
     return dY
 
 # TOP MODEL OF PROCESSOR WITH TWO BIT ADDRESSING
-def two_bit_processor_ext(Y, T, params_johnson, params_addr):
-    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, i1, i2, i3, i4  = Y
+def two_bit_processor_ext(Y, params_johnson, params_addr):
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, i1, i2, i3, i4, clk  = Y
 
-    Y_johnson = [a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2]
+    Y_johnson = [a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, clk]
     Y_address = [q1, not_q1, q2, not_q2, i1, i2, i3, i4]
     
     
-    dY_johnson = two_bit_model(Y_johnson, T, params_johnson)
-    dY_addr = two_bit_simple_addressing_ode_model(Y_address, T, params_addr)
+    dY_johnson = two_bit_model(Y_johnson, params_johnson)
+    dY_addr = two_bit_simple_addressing_ode_model(Y_address, params_addr)
 
-    dY = np.append(dY_johnson, dY_addr)
+    dY = dY_johnson + dY_addr
     return dY
 
 # TOP MODEL OF PROCESSOR WITH THREE BIT ADDRESSING
-def three_bit_processor_ext(Y, T, params_johnson, params_addr):
-    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, i1, i2, i3, i4, i5, i6  = Y
+def three_bit_processor_ext(Y, params_johnson, params_addr):
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, i1, i2, i3, i4, i5, i6, clk  = Y
 
-    Y_johnson = [a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3]
+    Y_johnson = [a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, clk]
     Y_address = [q1, not_q1, q2, not_q2, q3, not_q3, i1, i2, i3, i4, i5, i6]
     
     
-    dY_johnson = three_bit_model(Y_johnson, T, params_johnson)
-    dY_addr = three_bit_simple_addressing_ode_model(Y_address, T, params_addr)
+    dY_johnson = three_bit_model(Y_johnson, params_johnson)
+    dY_addr = three_bit_simple_addressing_ode_model(Y_address, params_addr)
 
-    dY = np.append(dY_johnson, dY_addr)
+    dY = dY_johnson + dY_addr
     return dY
 
 # TOP MODEL OF PROCESSOR WITH FOUR BIT ADDRESSING
-def four_bit_processor_ext(Y, T, params_johnson, params_addr):
-    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, i1, i2, i3, i4, i5, i6, i7, i8  = Y
+def four_bit_processor_ext(Y, params_johnson, params_addr):
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, i1, i2, i3, i4, i5, i6, i7, i8, clk  = Y
 
-    Y_johnson = [a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4]
+    Y_johnson = [a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, clk]
     Y_address = [q1, not_q1, q2, not_q2, q3, not_q3, q4, not_q4, i1, i2, i3, i4, i5, i6, i7, i8]
     
     
-    dY_johnson = four_bit_model(Y_johnson, T, params_johnson)
-    dY_addr = four_bit_simple_addressing_ode_model(Y_address, T, params_addr)
+    dY_johnson = four_bit_model(Y_johnson, params_johnson)
+    dY_addr = four_bit_simple_addressing_ode_model(Y_address, params_addr)
 
-    dY = np.append(dY_johnson, dY_addr)
+    dY = dY_johnson + dY_addr
     return dY
 
 
@@ -572,15 +647,7 @@ f.close()
 #print(get_reaction("- &delta1& *@a1@", "@a1@"))
 """
 
-
-def one_bit_processor_ext_to_sbml(filename):
-    Y = ["@a1@", "@not_a1@", "@q1@", "@not_q1@", "@i1@", "@i2@", "@clk@"]
-    params_ff = ["&alpha1&", "&alpha2&", "&alpha3&", "&alpha4&", "&delta1&", "&delta2&", "&Kd&", "&n&"]
-    params_addr = ["&alpha_I&", "&delta_I&", "&Kd_I&", "&n_I&"]
-    X = one_bit_processor_ext(Y, params_ff, params_addr)
-    reacts = to_reactions(X,Y)
-
-
+def to_sbml(reacts, filename):
     model = simplesbml.SbmlModel()
     model.addCompartment(1, comp_id='comp')
 
@@ -605,4 +672,53 @@ def one_bit_processor_ext_to_sbml(filename):
     print(model.toSBML(), file=f)
     f.close()
 
-one_bit_processor_ext_to_sbml("one_bit_proc.sbml")
+def one_bit_processor_ext_to_sbml(filename):
+    Y = ["@a1@", "@not_a1@", "@q1@", "@not_q1@", "@i1@", "@i2@", "@clk@"]
+    params_ff = ["&alpha1&", "&alpha2&", "&alpha3&", "&alpha4&", "&delta1&", "&delta2&", "&Kd&", "&n&"]
+    params_addr = ["&alpha_I&", "&delta_I&", "&Kd_I&", "&n_I&"]
+    X = one_bit_processor_ext(Y, params_ff, params_addr)
+    reacts = to_reactions(X,Y)
+
+    to_sbml(reacts, filename)
+
+def two_bit_processor_ext_to_sbml(filename):
+    #Y = ["@a1@", "@not_a1@", "@q1@", "@not_q1@", "@i1@", "@i2@", "@clk@"]
+    Y = ["@a1@", "@not_a1@", "@q1@", "@not_q1@", "@a2@", "@not_a2@", "@q2@", "@not_q2@", "@i1@", "@i2@", "@i3@", "@i4@", "@clk@"]
+    params_ff = ["&alpha1&", "&alpha2&", "&alpha3&", "&alpha4&", "&delta1&", "&delta2&", "&Kd&", "&n&"]
+    params_addr = ["&alpha_I&", "&delta_I&", "&Kd_I&", "&n_I&"]
+    X = two_bit_processor_ext(Y, params_ff, params_addr)
+    reacts = to_reactions(X,Y)
+
+    to_sbml(reacts, filename)
+
+def three_bit_processor_ext_to_sbml(filename):
+    #Y = ["@a1@", "@not_a1@", "@q1@", "@not_q1@", "@i1@", "@i2@", "@clk@"]
+    Y = ["@a1@", "@not_a1@", "@q1@", "@not_q1@", "@a2@", "@not_a2@", "@q2@", "@not_q2@", "@a3@", "@not_a3@", "@q3@", "@not_q3@", "@i1@", "@i2@", "@i3@", "@i4@", "@i5@", "@i6@", "@clk@"]
+    params_ff = ["&alpha1&", "&alpha2&", "&alpha3&", "&alpha4&", "&delta1&", "&delta2&", "&Kd&", "&n&"]
+    params_addr = ["&alpha_I&", "&delta_I&", "&Kd_I&", "&n_I&"]
+    X = three_bit_processor_ext(Y, params_ff, params_addr)
+    reacts = to_reactions(X,Y)
+
+    #f = open("test.txt", "w")
+    #for r in reacts:
+    #    print(r, file=f)
+    #f.close()
+
+    to_sbml(reacts, filename)
+
+def four_bit_processor_ext_to_sbml(filename):
+    #Y = ["@a1@", "@not_a1@", "@q1@", "@not_q1@", "@i1@", "@i2@", "@clk@"]
+    Y = ["@a1@", "@not_a1@", "@q1@", "@not_q1@", "@a2@", "@not_a2@", "@q2@", "@not_q2@", "@a3@", "@not_a3@", "@q3@", "@not_q3@", "@a4@", "@not_a4@", "@q4@", "@not_q4@", "@i1@", "@i2@", "@i3@", "@i4@", "@i5@", "@i6@", "@i7@", "@i8@", "@clk@"]
+    params_ff = ["&alpha1&", "&alpha2&", "&alpha3&", "&alpha4&", "&delta1&", "&delta2&", "&Kd&", "&n&"]
+    params_addr = ["&alpha_I&", "&delta_I&", "&Kd_I&", "&n_I&"]
+    X = four_bit_processor_ext(Y, params_ff, params_addr)
+    reacts = to_reactions(X,Y)
+
+    to_sbml(reacts, filename)
+
+
+
+one_bit_processor_ext_to_sbml(os.path.join("models", "SBML", "one_bit_proc.sbml"))
+two_bit_processor_ext_to_sbml(os.path.join("models", "SBML", "two_bit_proc.sbml"))
+three_bit_processor_ext_to_sbml(os.path.join("models", "SBML", "three_bit_proc.sbml"))
+four_bit_processor_ext_to_sbml(os.path.join("models", "SBML", "four_bit_proc.sbml"))

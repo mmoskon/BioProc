@@ -7,8 +7,10 @@ The repository includes the Python code for the analysis of a biological process
 Implementation of computational models and their analysis is available in `models` folder. The main files are as follows:
 * `models/bioproc/proc_models.py`: implementation of different processor topologies, 
 * `models/bioproc/proc_opt.py`: analysis of viable spaces for a selected topology,
+* `models/bioproc/proc_models_to_SBML.py`: export models to SBML,
 * `models/robustness_analysis.py`: analysis of robustness of the obtained solutions,
-* [`models/analyse_proc.ipynb`](models/analyse_proc.ipynb): interactive Python notebook with an example of analysis of different topologies.
+* [`models/analyse_proc.ipynb`](models/analyse_proc.ipynb): interactive Python notebook with an example of analysis of different topologies,
+* [`models/SBML`](models/SBML): models in SBML format.
 
 ## Compiler
 Implementation of the compiler and examples of different programs and their analysis is available in `compiler` folder. The main files are as follows:

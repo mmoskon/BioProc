@@ -13,27 +13,27 @@
       <compartment id="comp" spatialDimensions="3" size="1" units="litre" constant="true"/>
     </listOfCompartments>
     <listOfSpecies>
-      <species id="not_q1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="q1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="i1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="not_a1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="i2" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="a1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="not_a1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="not_q1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="clk" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="i1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="a1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="q1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
     </listOfSpecies>
     <listOfParameters>
-      <parameter id="delta_I" value="0" units="per_second" constant="false"/>
       <parameter id="delta2" value="0" units="per_second" constant="false"/>
-      <parameter id="alpha4" value="0" units="per_second" constant="false"/>
-      <parameter id="n_I" value="0" units="per_second" constant="false"/>
-      <parameter id="alpha_I" value="0" units="per_second" constant="false"/>
-      <parameter id="n" value="0" units="per_second" constant="false"/>
-      <parameter id="alpha1" value="0" units="per_second" constant="false"/>
       <parameter id="Kd" value="0" units="per_second" constant="false"/>
-      <parameter id="alpha3" value="0" units="per_second" constant="false"/>
-      <parameter id="delta1" value="0" units="per_second" constant="false"/>
-      <parameter id="Kd_I" value="0" units="per_second" constant="false"/>
       <parameter id="alpha2" value="0" units="per_second" constant="false"/>
+      <parameter id="alpha4" value="0" units="per_second" constant="false"/>
+      <parameter id="alpha_I" value="0" units="per_second" constant="false"/>
+      <parameter id="alpha3" value="0" units="per_second" constant="false"/>
+      <parameter id="delta_I" value="0" units="per_second" constant="false"/>
+      <parameter id="Kd_I" value="0" units="per_second" constant="false"/>
+      <parameter id="n_I" value="0" units="per_second" constant="false"/>
+      <parameter id="delta1" value="0" units="per_second" constant="false"/>
+      <parameter id="alpha1" value="0" units="per_second" constant="false"/>
+      <parameter id="n" value="0" units="per_second" constant="false"/>
     </listOfParameters>
     <listOfReactions>
       <reaction id="r0" reversible="false" fast="false">
@@ -43,8 +43,8 @@
         </listOfReactants>
         <listOfProducts>
           <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
-          <speciesReference species="a1" stoichiometry="1" constant="true"/>
           <speciesReference species="clk" stoichiometry="1" constant="true"/>
+          <speciesReference species="a1" stoichiometry="1" constant="true"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -164,9 +164,9 @@
           <speciesReference species="clk" stoichiometry="1" constant="true"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
           <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
           <speciesReference species="clk" stoichiometry="1" constant="true"/>
+          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -274,8 +274,8 @@
       </reaction>
       <reaction id="r6" reversible="false" fast="false">
         <listOfReactants>
-          <speciesReference species="a1" stoichiometry="1" constant="true"/>
           <speciesReference species="clk" stoichiometry="1" constant="true"/>
+          <speciesReference species="a1" stoichiometry="1" constant="true"/>
         </listOfReactants>
         <listOfProducts>
           <speciesReference species="clk" stoichiometry="1" constant="true"/>
@@ -408,13 +408,13 @@
       </reaction>
       <reaction id="r9" reversible="false" fast="false">
         <listOfReactants>
-          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
           <speciesReference species="clk" stoichiometry="1" constant="true"/>
+          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
           <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
           <speciesReference species="clk" stoichiometry="1" constant="true"/>
+          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -545,8 +545,8 @@
           <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="i1" stoichiometry="1" constant="true"/>
           <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
+          <speciesReference species="i1" stoichiometry="1" constant="true"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
