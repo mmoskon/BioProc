@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" level="3" version="1">
+  <model substanceUnits="mole" timeUnits="second" extentUnits="mole">
+    <listOfUnitDefinitions>
+      <unitDefinition id="per_second">
+        <listOfUnits>
+          <unit kind="second" exponent="-1" scale="0" multiplier="1"/>
+        </listOfUnits>
+      </unitDefinition>
+    </listOfUnitDefinitions>
+    <listOfCompartments>
+      <compartment id="c1" spatialDimensions="3" size="1" units="litre" constant="true"/>
+      <compartment id="comp" spatialDimensions="3" size="1" units="litre" constant="true"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species id="not_q1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="q1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="i1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="not_a1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="i2" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="a1" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="clk" compartment="comp" initialAmount="0" substanceUnits="mole" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+    </listOfSpecies>
+    <listOfParameters>
+      <parameter id="delta_I" value="0" units="per_second" constant="false"/>
+      <parameter id="delta2" value="0" units="per_second" constant="false"/>
+      <parameter id="alpha4" value="0" units="per_second" constant="false"/>
+      <parameter id="n_I" value="0" units="per_second" constant="false"/>
+      <parameter id="alpha_I" value="0" units="per_second" constant="false"/>
+      <parameter id="n" value="0" units="per_second" constant="false"/>
+      <parameter id="alpha1" value="0" units="per_second" constant="false"/>
+      <parameter id="Kd" value="0" units="per_second" constant="false"/>
+      <parameter id="alpha3" value="0" units="per_second" constant="false"/>
+      <parameter id="delta1" value="0" units="per_second" constant="false"/>
+      <parameter id="Kd_I" value="0" units="per_second" constant="false"/>
+      <parameter id="alpha2" value="0" units="per_second" constant="false"/>
+    </listOfParameters>
+    <listOfReactions>
+      <reaction id="r0" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
+          <speciesReference species="clk" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
+          <speciesReference species="a1" stoichiometry="1" constant="true"/>
+          <speciesReference species="clk" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> alpha1 </ci>
+              <apply>
+                <divide/>
+                <apply>
+                  <power/>
+                  <apply>
+                    <divide/>
+                    <ci> not_q1 </ci>
+                    <ci> Kd </ci>
+                  </apply>
+                  <ci> n </ci>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> not_q1 </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> clk </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <apply>
+                      <power/>
+                      <apply>
+                        <divide/>
+                        <ci> not_q1 </ci>
+                        <ci> Kd </ci>
+                      </apply>
+                      <ci> n </ci>
+                    </apply>
+                    <apply>
+                      <power/>
+                      <apply>
+                        <divide/>
+                        <ci> clk </ci>
+                        <ci> Kd </ci>
+                      </apply>
+                      <ci> n </ci>
+                    </apply>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r1" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
+          <speciesReference species="a1" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> alpha2 </ci>
+              <apply>
+                <divide/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> not_a1 </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r2" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="a1" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> delta1 </ci>
+              <ci> a1 </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r3" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
+          <speciesReference species="clk" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
+          <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
+          <speciesReference species="clk" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> alpha1 </ci>
+              <apply>
+                <divide/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> not_q1 </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> clk </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <apply>
+                      <power/>
+                      <apply>
+                        <divide/>
+                        <ci> not_q1 </ci>
+                        <ci> Kd </ci>
+                      </apply>
+                      <ci> n </ci>
+                    </apply>
+                    <apply>
+                      <power/>
+                      <apply>
+                        <divide/>
+                        <ci> clk </ci>
+                        <ci> Kd </ci>
+                      </apply>
+                      <ci> n </ci>
+                    </apply>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r4" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="a1" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
+          <speciesReference species="a1" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> alpha2 </ci>
+              <apply>
+                <divide/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> a1 </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r5" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> delta1 </ci>
+              <ci> not_a1 </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r6" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="a1" stoichiometry="1" constant="true"/>
+          <speciesReference species="clk" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="clk" stoichiometry="1" constant="true"/>
+          <speciesReference species="a1" stoichiometry="1" constant="true"/>
+          <speciesReference species="q1" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> alpha3 </ci>
+              <apply>
+                <divide/>
+                <apply>
+                  <times/>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> a1 </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> clk </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> a1 </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> clk </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <apply>
+                      <power/>
+                      <apply>
+                        <divide/>
+                        <ci> a1 </ci>
+                        <ci> Kd </ci>
+                      </apply>
+                      <ci> n </ci>
+                    </apply>
+                    <apply>
+                      <power/>
+                      <apply>
+                        <divide/>
+                        <ci> clk </ci>
+                        <ci> Kd </ci>
+                      </apply>
+                      <ci> n </ci>
+                    </apply>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r7" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
+          <speciesReference species="q1" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> alpha4 </ci>
+              <apply>
+                <divide/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> not_q1 </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r8" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="q1" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> delta2 </ci>
+              <ci> q1 </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r9" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
+          <speciesReference species="clk" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="not_a1" stoichiometry="1" constant="true"/>
+          <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
+          <speciesReference species="clk" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> alpha3 </ci>
+              <apply>
+                <divide/>
+                <apply>
+                  <times/>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> not_a1 </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> clk </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> not_a1 </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> clk </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <apply>
+                      <power/>
+                      <apply>
+                        <divide/>
+                        <ci> not_a1 </ci>
+                        <ci> Kd </ci>
+                      </apply>
+                      <ci> n </ci>
+                    </apply>
+                    <apply>
+                      <power/>
+                      <apply>
+                        <divide/>
+                        <ci> clk </ci>
+                        <ci> Kd </ci>
+                      </apply>
+                      <ci> n </ci>
+                    </apply>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r10" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="q1" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
+          <speciesReference species="q1" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> alpha4 </ci>
+              <apply>
+                <divide/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> q1 </ci>
+                      <ci> Kd </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r11" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> delta2 </ci>
+              <ci> not_q1 </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r12" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="i1" stoichiometry="1" constant="true"/>
+          <speciesReference species="not_q1" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <ci> alpha_I </ci>
+                <apply>
+                  <power/>
+                  <apply>
+                    <divide/>
+                    <ci> not_q1 </ci>
+                    <ci> Kd_I </ci>
+                  </apply>
+                  <ci> n_I </ci>
+                </apply>
+              </apply>
+              <apply>
+                <plus/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <power/>
+                  <apply>
+                    <divide/>
+                    <ci> not_q1 </ci>
+                    <ci> Kd_I </ci>
+                  </apply>
+                  <ci> n_I </ci>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r13" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="i1" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> delta_I </ci>
+              <ci> i1 </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r14" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="q1" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="i2" stoichiometry="1" constant="true"/>
+          <speciesReference species="q1" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <ci> alpha_I </ci>
+                <apply>
+                  <power/>
+                  <apply>
+                    <divide/>
+                    <ci> q1 </ci>
+                    <ci> Kd_I </ci>
+                  </apply>
+                  <ci> n_I </ci>
+                </apply>
+              </apply>
+              <apply>
+                <plus/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <power/>
+                  <apply>
+                    <divide/>
+                    <ci> q1 </ci>
+                    <ci> Kd_I </ci>
+                  </apply>
+                  <ci> n_I </ci>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r15" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="i2" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> delta_I </ci>
+              <ci> i2 </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+    </listOfReactions>
+  </model>
+</sbml>
+
