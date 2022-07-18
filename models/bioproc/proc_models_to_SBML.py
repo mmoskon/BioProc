@@ -718,7 +718,7 @@ def four_bit_processor_ext_to_sbml(filename):
 
 
 
-one_bit_processor_ext_to_sbml(os.path.join("models", "SBML", "one_bit_proc.sbml"))
-two_bit_processor_ext_to_sbml(os.path.join("models", "SBML", "two_bit_proc.sbml"))
-three_bit_processor_ext_to_sbml(os.path.join("models", "SBML", "three_bit_proc.sbml"))
-four_bit_processor_ext_to_sbml(os.path.join("models", "SBML", "four_bit_proc.sbml"))
+one_bit_processor_ext_to_sbml(os.path.join("SBML", "one_bit_proc.sbml"))
+two_bit_processor_ext_to_sbml(os.path.join("SBML", "two_bit_proc.sbml"))
+three_bit_processor_ext_to_sbml(os.path.join("SBML", "three_bit_proc.sbml"))
+four_bit_processor_ext_to_sbml(os.path.join("SBML", "four_bit_proc.sbml"))
