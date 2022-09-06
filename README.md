@@ -1,6 +1,12 @@
 # A Computational Design of a Programmable Biological Processor
 
-The repository includes the Python code for the analysis of a biological processor proposed in the paper *A Computational Design of a Programmable Biological Processor*.  
+The repository includes the Python code for the analysis of a biological processor proposed in the paper *A Computational Design of a Programmable Biological Processor*. 
+
+## Citation
+
+The proposed design is described and analysed in the following paper:
+
+Moškon M, Pušnik Ž, Stanovnik L, Zimic N, Mraz M. **A Computational Design of a Programmable Biological Processor**, *BioSystems* (accepted for publication).
 
 ## Models
 
