@@ -1,5 +1,13 @@
 # A Computational Design of a Programmable Biological Processor
 
+---
+
+[![](https://img.shields.io/badge/DOI-10.1016%2Fj.biosystems.2022.104778-brightgreen)](https://doi.org/10.1016/j.biosystems.2022.104778)
+
+---
+
+
+
 The repository includes the Python code for the analysis of a biological processor proposed in the paper *A Computational Design of a Programmable Biological Processor*. 
 
 ## Citation
