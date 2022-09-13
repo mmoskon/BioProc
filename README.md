@@ -14,8 +14,7 @@ The repository includes the Python code for the analysis of a biological process
 
 The proposed design is described and analysed in the following paper:
 
-Moškon M, Pušnik Ž, Stanovnik L, Zimic N, Mraz M. **A Computational Design of a Programmable Biological Processor**, *BioSystems* (accepted for publication).
-
+Moškon M, Pušnik Ž, Stanovnik L, Zimic N, Mraz M. **A Computational Design of a Programmable Biological Processor**, *BioSystems*, 2022, 104778, DOI: (10.1016/j.biosystems.2022.104778)(https://doi.org/10.1016/j.biosystems.2022.104778).
 ## Models
 
 Implementation of computational models and their analysis is available in `models` folder. The main files are as follows:
