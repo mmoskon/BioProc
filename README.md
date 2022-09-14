@@ -15,6 +15,12 @@ The repository includes the Python code for the analysis of a biological process
 The proposed design is described and analysed in the following paper:
 
 Moškon M, Pušnik Ž, Stanovnik L, Zimic N, Mraz M. **A Computational Design of a Programmable Biological Processor**, *BioSystems*, 2022, 104778, DOI: [10.1016/j.biosystems.2022.104778](https://doi.org/10.1016/j.biosystems.2022.104778).
+
+## Examples
+Examples are available as interactive Python notebooks:
+* [`compiler/simulate_processor.ipynb`](compiler/simulate_processor.ipynb): interactive Python notebook with the description of the biological compiler, the processor language syntax and with the examples of different programs and their analysis.
+* [`models/analyse_proc.ipynb`](models/analyse_proc.ipynb): interactive Python notebook with an example of analysis of different topologies.
+
 ## Models
 
 Implementation of computational models and their analysis is available in `models` folder. The main files are as follows:
@@ -37,11 +43,6 @@ Data and results are available in the following folders:
 * `models/results_robustness`: results of the robustness analyses,
 * `compiler/programs`: examples of different models in `txt` format together with their translation into Python models.
 * `compiler/figs/programs`: simulation results performed on different biological programs.
-
-## Examples
-Examples are available as interactive Python notebooks:
-* [`compiler/simulate_processor.ipynb`](compiler/simulate_processor.ipynb): interactive Python notebook with the description of the biological compiler, the processor language syntax and with the examples of different programs and their analysis.
-* [`models/analyse_proc.ipynb`](models/analyse_proc.ipynb): interactive Python notebook with an example of analysis of different topologies.
 
 ## Prerequisites
 
